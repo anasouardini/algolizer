@@ -1,4 +1,4 @@
-const merge = (list: any[]) => {
+const merge = (list: number[]) => {
   const output = [...list];
 
   const mergeSrt = (outputArg: number[]) => {
@@ -7,8 +7,8 @@ const merge = (list: any[]) => {
     }
 
     // split
-    let leftArr = outputArg.slice(0, (outputArg.length / 2));
-    let rightArr = outputArg.slice((outputArg.length / 2));
+    let leftArr = outputArg.slice(0, outputArg.length / 2);
+    let rightArr = outputArg.slice(outputArg.length / 2);
     leftArr = mergeSrt(leftArr as []) as [];
     rightArr = mergeSrt(rightArr as []) as [];
 
@@ -26,10 +26,10 @@ const merge = (list: any[]) => {
       sorted.push(rightArr[r]);
       r++;
     }
-    if(l < leftArr.length){
-      sorted = [...sorted, ...leftArr.slice(l)]
-    }else{
-      sorted = [...sorted, ...rightArr.slice(r)]
+    if (l < leftArr.length) {
+      sorted = [...sorted, ...leftArr.slice(l)];
+    } else {
+      sorted = [...sorted, ...rightArr.slice(r)];
     }
 
     return sorted;

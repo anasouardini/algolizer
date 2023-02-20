@@ -1,18 +1,39 @@
-const quick = (list: any[]) => {
+import { stepsLogT } from '../types';
+
+const quick = (list: number[], stepsLog: stepsLogT) => {
   const output = [...list];
 
-  const quickSrt = (outputArg: number[]) => {
-    if (outputArg && outputArg.length < 2) {
-      return outputArg;
+  const quickSrt = (
+    outputArg: number[],
+    start: number = 0,
+    end: number,
+    stepsLog: stepsLogT
+  ) => {
+    if (outputArg && end - start < 2) {
+      return [];
     }
 
-    let pivot = outputArg.at(-1) as number;
-    let swapper = -1;
+    let pivot = end;
+    let swapper = start - 1;
 
-    let i = 0;
-    for (; i < outputArg.length - 1; i++) {
-      if (outputArg[i] < pivot) {
+    let i = start;
+    for (; i < end; i++) {
+      stepsLog.push({
+        type: 'compare',
+        elements: [
+          { type: 'index', value: i },
+          { type: 'index', value: pivot },
+        ],
+      });
+      if (outputArg[i] < outputArg[pivot]) {
         swapper++;
+        stepsLog.push({
+          type: 'swap',
+          elements: [
+            { type: 'index', value: i },
+            { type: 'index', value: swapper },
+          ],
+        });
         if (outputArg[i] != outputArg[swapper]) {
           outputArg[i] ^= outputArg[swapper];
           outputArg[swapper] ^= outputArg[i];
@@ -21,21 +42,41 @@ const quick = (list: any[]) => {
       }
     }
     swapper++;
+    stepsLog.push({
+      type: 'swap',
+      elements: [
+        { type: 'index', value: i },
+        { type: 'index', value: swapper },
+      ],
+    });
     if (outputArg[i] != outputArg[swapper]) {
       outputArg[i] ^= outputArg[swapper];
       outputArg[swapper] ^= outputArg[i];
       outputArg[i] ^= outputArg[swapper];
     }
 
-    let leftArg = outputArg.slice(0, outputArg.indexOf(pivot));
-    let rightArg = outputArg.slice(outputArg.indexOf(pivot) + 1);
-    const left = quickSrt(leftArg as []) as [];
-    const right = quickSrt(rightArg as []) as [];
+    stepsLog.push({
+      type: 'split',
+      chunks: [
+        { start, end: pivot - 1 },
+        { start: pivot - 1, end },
+      ],
+    });
+    const left = quickSrt(outputArg, start, pivot - 1) as [];
+    const right = quickSrt(outputArg, pivot + 1, end) as [];
 
-    return [...left, pivot, ...right];
+    stepsLog.push({
+      type: 'concat',
+      chunks: [
+        { start, end: pivot - 1 },
+        { start: pivot, end: pivot },
+        { start: pivot - 1, end },
+      ],
+    });
+    return [...left, outputArg[pivot], ...right];
   };
 
-  return quickSrt(output);
+  return quickSrt(output, 0, output.length - 1, stepsLog);
 };
 
 export default quick;
