@@ -10,12 +10,16 @@ export default function Ranking() {
     'sorting'
   );
 
-  const cbQueueRef = React.useRef<{step: () => void, length: number}[]>([]).current;
+  const cbQueueRef = React.useRef<{[key: string]: { stepCB: () => void; length: number, currentStep: number }}>(
+    {}
+  ).current;
   const runSteps = () => {
-    cbQueueRef.forEach((cb) =>{
-      for(let i=0;i<cb.length;i++){
-        cb.step()
-      }
+    Object.values(cbQueueRef).forEach((cb) => {
+      // for(let i=0;i<cb.length;i++){
+      console.log(cb.currentStep+'/'+ cb.length)
+      if(cb.length == cb.currentStep) return
+      cb.stepCB();
+      // }
     });
   };
 
@@ -25,13 +29,20 @@ export default function Ranking() {
 
       if (tabState == 'sorting') {
         return algorithms[tabState].map((algo) => {
-          const stepsLog:stepsLogT = [];
-          console.log(algo.name)
+          const stepsLog: stepsLogT = [];
+          // console.log(algo.name)
           algo(data, stepsLog);
           // console.log('algoRun: ', `[${tabState}]`, datum.name, '=>', algo.name)
+          const cellCbQueueKey = datum.name+''+algo.name;
+          cbQueueRef[cellCbQueueKey] = {};
           return (
             <td key={`${algo.name}-${datum.name}`}>
-              <AlgoAnimation data={data} stepsLog={stepsLog} queue={cbQueueRef}/>
+              <AlgoAnimation
+                info={{ dataName: datum.name, algoName: algo.name }}
+                data={data}
+                stepsLog={stepsLog}
+                queue={cbQueueRef[cellCbQueueKey]}
+              />
             </td>
           );
         });
@@ -40,7 +51,7 @@ export default function Ranking() {
       // TODO: set Random target
       // TODO: [opt] get searching vlaue from the user
       return algorithms[tabState].map((algo) => {
-        const stepsLog:stepsLogT = [];
+        const stepsLog: stepsLogT = [];
         algo(data, randomTarget, stepsLog);
         return (
           <td key={`${algo.name}-${datum.name}`}>

@@ -9,9 +9,12 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
     end: number,
     stepsLog: stepsLogT
   ) => {
+    // console.log(stepsLog)
+
     if (outputArg && end - start < 2) {
       return [];
     }
+
 
     let pivot = end;
     let swapper = start - 1;
@@ -62,8 +65,8 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
         { start: pivot - 1, end },
       ],
     });
-    const left = quickSrt(outputArg, start, pivot - 1) as [];
-    const right = quickSrt(outputArg, pivot + 1, end) as [];
+    const left = quickSrt(outputArg, start, pivot - 1, stepsLog) as [];
+    const right = quickSrt(outputArg, pivot + 1, end, stepsLog) as [];
 
     stepsLog.push({
       type: 'concat',

@@ -11,8 +11,8 @@ const insertion = (inputList: number[], stepsLog: stepsLogT) => {
       stepsLog.push({
         type: 'compare',
         elements: [
-          { type: 'value', value: tmp },
           { type: 'index', value: j },
+          { type: 'value', value: tmp },
         ],
       });
 
