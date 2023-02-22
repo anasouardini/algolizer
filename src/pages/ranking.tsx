@@ -16,7 +16,7 @@ export default function Ranking() {
   const runSteps = () => {
     Object.values(cbQueueRef).forEach((cb) => {
       // for(let i=0;i<cb.length;i++){
-      console.log(cb.currentStep+'/'+ cb.length)
+      // console.log(cb.currentStep+'/'+ cb.length)
       if(cb.length == cb.currentStep) return
       cb.stepCB();
       // }
@@ -80,7 +80,7 @@ export default function Ranking() {
             <th>
               <button
                 onClick={runSteps}
-                className={`border-blue-400 border-${new Date} rounded-md px-3 py-1`}
+                className={`border-blue-400 border-2 rounded-md px-3 py-1`}
               >
                 play All
               </button>

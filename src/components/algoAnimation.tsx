@@ -35,10 +35,11 @@ export default function AlgoAnimation(props: propsT) {
 
   React.useEffect(() => {
     type stepsActionsT = {
-      [key: string]: { do: () => void; undo: () => void };
+      [key: string]: { do: (step) => void; undo: (step) => void };
     };
     const stepsActions: stepsActionsT = {
-      compare: { do: () => {
+      compare: { do: (step) => {
+          // console.log(step)
           const firstIndex = step.elements[0].value;
           // const secondIndex = step.elements[1].value;
           // console.log(firstIndex);
@@ -47,9 +48,9 @@ export default function AlgoAnimation(props: propsT) {
 
           barsRefs[firstIndex].style.background = stepsActionsColor[step.type][0];
           // barsRefs[secondIndex].style.background = stepsActionsColor[step.type][1];
-      }, undo: () => {} },
+      }, undo: (step) => {} },
       swap: {
-        do: ()=>{
+        do: (step)=>{
           let tmp;
           const firstIndex = step.elements[0].value;
           const secondIndex = step.elements[1].value;
@@ -59,10 +60,10 @@ export default function AlgoAnimation(props: propsT) {
           barsRefs[firstIndex] = barsRefs[secondIndex];
           barsRefs[secondIndex] = tmp;
         },
-        undo: ()=>{}
+        undo: (step)=>{}
       },
       replace: {
-        do: ()=>{
+        do: (step)=>{
           const indexToReplace = step.elements[0].value;
           const valueToReplaceWith = step.elements[1].value;
 
@@ -73,20 +74,20 @@ export default function AlgoAnimation(props: propsT) {
           );
 
         },
-        undo: ()=>{}
+        undo: (step)=>{}
       },
       reduce: {
-        do: ()=>{
+        do: (step)=>{
           const start = step.range.start;
           const end = step.range.end;
           for (let i = start; i <= end; i++) {
             barsRefs[i].style.background = stepsActionsColor[step.type][0];
           }
         },
-        undo: ()=>{}
+        undo: (step)=>{}
       },
       shift: {
-        do: ()=>{
+        do: (step)=>{
           // TODO: the "to" index is not needed, direction is enough
           const from = step.elements.from;
           const to = step.elements.to;
@@ -95,22 +96,22 @@ export default function AlgoAnimation(props: propsT) {
           barsRefs[to] = barsRefs[from];
           barsRefs[from].style.background = stepsActionsColor[step.type][0];
         },
-        undo: ()=>{}
+        undo: (step)=>{}
       },
       calc: {
-        do: ()=>{
+        do: (step)=>{
           // TODO: show some calculating animation
         },
-        undo: ()=>{}
+        undo: (step)=>{}
       },
       push: {
-        do: ()=>{
+        do: (step)=>{
           // TODO: find a way to visualize both of lists and push to the second list
         },
-        undo: ()=>{}
+        undo: (step)=>{}
       },
       split: {
-        do: ()=>{
+        do: (step)=>{
           for (let i = 0; i < 2; i++) {
             const start = step.chunks[i].start;
             const end = step.chunks[i].end;
@@ -121,10 +122,10 @@ export default function AlgoAnimation(props: propsT) {
             }
           }
         },
-        undo: ()=>{}
+        undo: (step)=>{}
       },
       concat: {
-        do: ()=>{
+        do: (step)=>{
           for (let i = 0; i < 2; i++) {
             const start = step.chunks[i].start;
             const end = step.chunks[i].end;
@@ -135,7 +136,7 @@ export default function AlgoAnimation(props: propsT) {
             }
           }
         },
-        undo: ()=>{}
+        undo: (step)=>{}
       },
     };
 
@@ -147,17 +148,20 @@ export default function AlgoAnimation(props: propsT) {
       // TODO: the second item in elements might be value|index, add a condition
       // TODO: add a final step in the algos implementation
       // TODO: abstract steps actions and add a revert-step acion to it
-      props.stepsLog.map((step) => {
+      // props.stepsLog.forEach((step) => {
         // TODO: manage timing
-        stepsActions[step.type].do();
-        stepsActions[step.type].undo();
-      });
+        const currentStep = props.stepsLog[props.queue.currentStep];
+        // console.log(currentStep)
+        stepsActions[currentStep.type].do(currentStep);
+        stepsActions[currentStep.type].undo(currentStep);
+      // });
     };
 
     props.queue.stepCB = step;
     props.queue.length = props.stepsLog.length;
     props.queue.currentStep = 0;
   }, []);
+
   return (
     <ul className={`p-1 text-center flex gap-1`}>
       {props.data.map((bar, index) => {
@@ -166,8 +170,8 @@ export default function AlgoAnimation(props: propsT) {
             key={index}
             data-value={bar}
             ref={(el) => barsRefs.push(el)}
-            style={{background: stepsActionsColor.idle[0]}}
-            className={`h-[${bar}px] w-[7px]`}
+            style={{background: stepsActionsColor.idle[0], height: `${bar}px`}}
+            className={`w-[7px]`}
           ></li>
         );
       })}
