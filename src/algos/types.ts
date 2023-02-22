@@ -18,4 +18,4 @@ type stepsLogT = {
   chunks?: { start: number; end: number }[];
   value?: number;
 }[];
-export type { stepsLogT };
+export type { logStepTypeT, stepsLogT };
