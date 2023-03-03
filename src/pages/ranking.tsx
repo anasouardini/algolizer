@@ -6,27 +6,41 @@ import { stepsLogT } from '../algos/types';
 import AlgoAnimation from '../components/algoAnimation';
 
 export default function Ranking() {
-  const [tabState, setTabState] = React.useState<'sorting' | 'searching'>(
-    'sorting'
-  );
+  const [state, setState] = React.useState<{
+    currentTab: 'sorting' | 'searching';
+    rerender: boolean;
+  }>({ currentTab: 'sorting', rerender: false });
 
   const cbQueueRef = React.useRef<{
-    [key: string]: { stepCB: () => void; length: number; currentStep: number };
+    [key: string]: { stepCB: () => void; length: number; currentStep: number, stepDuration: number };
   }>({}).current;
-  const domRefs = React.useRef<{ [key: string]: HTMLElement | null }>(
-    {}
-  ).current;
+  // const domRefs = React.useRef<{ [key: string]: HTMLElement | null }>(
+  //   {}
+  // ).current;
+  const stepperStateRef = React.useRef<{ running: boolean }>({
+    running: false,
+  }).current;
 
   // run step that run the next step
 
+  // TODO: add stop method
+  // TODO: add data regenration method
+  // TODO: step duration should be determined from the cell itself
+  // TODO: each cell should have it's own controls
+
   // my context switcher
   const runSteps = (e) => {
-    if (e.target.disabled) {
+    console.log(cbQueueRef)
+
+    if (stepperStateRef.running === true) {
+      stepperStateRef.running = false;
+      e.target.innerText = 'Play All';
       return;
     }
 
-    e.target.class = `border-gray text-gray pointer-forbidden border-2 rounded-md px-3 py-1`;
-    e.target.disabled = true;
+    stepperStateRef.running = true;
+
+    e.target.innerText = 'Pause All';
 
     // const cellsList = [Object.values(cbQueueRef)[0]];
     // cellsList.forEach((cb) => {
@@ -34,19 +48,23 @@ export default function Ranking() {
       counter: 0,
       inc: () => {
         cellsDoneCounter.counter++;
-        if(cellsDoneCounter.counter == Object.keys(cbQueueRef).length){
-          e.target.class = `border-blue-400 border-2 rounded-md px-3 py-1`;
-          e.target.disabled = false;
+        if (cellsDoneCounter.counter == Object.keys(cbQueueRef).length) {
+          e.target.innerText = 'Play All';
         }
       },
     };
     Object.values(cbQueueRef).forEach((cb) => {
       const stepper = async () => {
-        if (cb.currentStep >= cb.length) {
-          cellsDoneCounter.inc()
+        if (stepperStateRef.running === false) {
+          console.log('stopping...');
           return;
-        };
-        await ((ms) => new Promise((r) => setTimeout(r, ms)))(100);
+        }
+
+        if (cb.currentStep >= cb.length) {
+          cellsDoneCounter.inc();
+          return;
+        }
+        await ((ms) => new Promise((r) => setTimeout(r, ms)))(cb.stepDuration);
         cb.stepCB();
         stepper();
       };
@@ -54,17 +72,28 @@ export default function Ranking() {
     });
   };
 
+  const oneStepTest = ()=>{
+    Object.values(cbQueueRef)[1].stepCB();
+  }
+
+  const regenerateCells = (e) => {
+    const stateCpy = structuredClone(state);
+    stateCpy.rerender = !stateCpy.rerender;
+    setState(stateCpy);
+  };
+
   const genCells = () => {
     const mapDataStructureToAlgorithm = (datum: () => number[]) => {
       const data = datum();
 
-      if (tabState == 'sorting') {
-        return algorithms[tabState].map((algo) => {
+      if (state.currentTab == 'sorting') {
+        return algorithms[state.currentTab].map((algo) => {
           const stepsLog: stepsLogT = [];
           // console.log(algo.name)
           algo(data, stepsLog);
           // console.log('algoRun: ', `[${tabState}]`, datum.name, '=>', algo.name)
           const cellCbQueueKey = datum.name + '' + algo.name;
+          // console.log('gencells')
           cbQueueRef[cellCbQueueKey] = {};
           return (
             <td key={`${algo.name}-${datum.name}`}>
@@ -81,7 +110,7 @@ export default function Ranking() {
 
       // TODO: set Random target
       // TODO: [opt] get searching vlaue from the user
-      return algorithms[tabState].map((algo) => {
+      return algorithms[state.currentTab].map((algo) => {
         const stepsLog: stepsLogT = [];
         algo(data, randomTarget, stepsLog);
         return (
@@ -104,22 +133,31 @@ export default function Ranking() {
   const tableCells = genCells();
 
   return (
-    <main>
+    <main className={`p-5`}>
       <table>
         <thead>
           <tr>
             <th>
               <button
-                ref={(el) => {
-                  domRefs.playButton = el;
-                }}
+                onClick={oneStepTest}
+                className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+              >
+                step
+              </button>
+              <button
                 onClick={runSteps}
                 className={`border-blue-400 border-2 rounded-md px-3 py-1`}
               >
                 play All
               </button>
+              <button
+                onClick={regenerateCells}
+                className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+              >
+                Restart
+              </button>
             </th>
-            {algorithms[tabState].map((algo) => {
+            {algorithms[state.currentTab].map((algo) => {
               return <th key={`${algo.name}`}>{algo.name}</th>;
             })}
           </tr>
@@ -128,7 +166,7 @@ export default function Ranking() {
           {Object.keys(tableCells).map((ItemKey) => {
             return (
               <tr key={`${ItemKey}`} className={``}>
-                <th>{ItemKey}</th>
+                <th className={`text-left`}>{ItemKey}</th>
                 {tableCells[ItemKey]}
               </tr>
             );
