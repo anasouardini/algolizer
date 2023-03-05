@@ -17,7 +17,7 @@ type propsT = {
 
 export default function AlgoAnimation(props: propsT) {
   const barsRefs = React.useRef<(HTMLElement | null)[]>([]).current;
-
+  let cellRef = React.useRef<HTMLElement | null>(null).current;
   // LOGGING STEPS
   // if (props.info.algoName == 'selection') {
   //   props.stepsLog.forEach((step) => {
@@ -40,7 +40,10 @@ export default function AlgoAnimation(props: propsT) {
   };
 
   type stepsActionsT = {
-    [key: string]: { do: (step) => void; undo: (step) => void };
+    [key: string]: {
+      do: (step) => void;
+      undo: (step, end: boolean) => void;
+    };
   };
 
   const domUtilities = {
@@ -68,7 +71,10 @@ export default function AlgoAnimation(props: propsT) {
         barsRefs[secondIndex].style.background =
           stepsActionsColor[step.type][0];
       },
-      undo: (step) => {
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
         const firstIndex = step.elements[0].value;
         const secondIndex = step.elements[1].value;
         barsRefs[firstIndex].style.background = stepsActionsColor['idle'][0];
@@ -86,7 +92,10 @@ export default function AlgoAnimation(props: propsT) {
         // swaping refs of bars
         domUtilities.swap(barsRefs[firstIndex], barsRefs[secondIndex]);
       },
-      undo: (step) => {
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
         const firstIndex = step.elements[0].value;
         const secondIndex = step.elements[1].value;
         barsRefs[firstIndex].style.background = stepsActionsColor['idle'][0];
@@ -104,7 +113,11 @@ export default function AlgoAnimation(props: propsT) {
           barsRefs[valueToReplaceWith]
         );
       },
-      undo: (step) => {},
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
+      },
     },
     reduce: {
       do: (step) => {
@@ -114,7 +127,11 @@ export default function AlgoAnimation(props: propsT) {
           barsRefs[i].style.background = stepsActionsColor[step.type][0];
         }
       },
-      undo: (step) => {},
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
+      },
     },
     shift: {
       do: (step) => {
@@ -126,19 +143,31 @@ export default function AlgoAnimation(props: propsT) {
         barsRefs[to] = barsRefs[from];
         barsRefs[from].style.background = stepsActionsColor[step.type][0];
       },
-      undo: (step) => {},
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
+      },
     },
     calc: {
       do: (step) => {
         // TODO: show some calculating animation
       },
-      undo: (step) => {},
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
+      },
     },
     push: {
       do: (step) => {
         // TODO: find a way to visualize both of lists and push to the second list
       },
-      undo: (step) => {},
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
+      },
     },
     split: {
       do: (step) => {
@@ -152,7 +181,11 @@ export default function AlgoAnimation(props: propsT) {
           }
         }
       },
-      undo: (step) => {},
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
+      },
     },
     concat: {
       do: (step) => {
@@ -166,7 +199,11 @@ export default function AlgoAnimation(props: propsT) {
           }
         }
       },
-      undo: (step) => {},
+      undo: (step, end) => {
+        if (end) {
+          cellRef?.classList.add('algoDone');
+        }
+      },
     },
   };
 
@@ -189,7 +226,11 @@ export default function AlgoAnimation(props: propsT) {
     console.log(currentStep);
     stepsActions[currentStep.type].do(currentStep);
     setTimeout(() => {
-      stepsActions[currentStep.type].undo(currentStep);
+      let end = false;
+      if (props.queue.length === props.queue.currentStep) {
+        end = true;
+      }
+      stepsActions[currentStep.type].undo(currentStep, end);
     }, props.queue.stepDuration / 1.5);
 
     props.queue.currentStep++;
@@ -199,7 +240,8 @@ export default function AlgoAnimation(props: propsT) {
 
   return (
     <ul
-      className={`p-1 m-1 text-center h-[5.5rem] border-2 border-green-500 flex gap-1`}
+      ref={(el) => (cellRef = el)}
+      className={`relative p-1 m-1 text-center h-[5.5rem] border-2 border-green-500 flex gap-1`}
     >
       {props.data.map((bar, index) => {
         return (

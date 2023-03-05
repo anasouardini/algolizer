@@ -12,7 +12,10 @@ const interpolation = (list: number[], target: number, stepsLog:stepsLogT) => {
     stepsLog.push({type: 'calc', value: probe});
 
     stepsLog.push({type: 'compare', elements: [{type: 'value', value: target}, {type: 'index', value: probe}]});
-    if (target == tmpList[probe]) return true;
+    if (target == tmpList[probe]) {
+      stepsLog.push({type: 'found', element: {type: 'index', value: probe}});
+      return true;
+    }
 
     stepsLog.push({type: 'compare', elements: [{type: 'value', value: target}, {type: 'index', value: probe}]});
     if (target < tmpList[probe]) {
@@ -26,6 +29,7 @@ const interpolation = (list: number[], target: number, stepsLog:stepsLogT) => {
     continue;
   }
 
+  stepsLog.push({type: 'notFound'});
   return false;
 };
 

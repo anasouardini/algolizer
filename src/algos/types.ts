@@ -1,5 +1,7 @@
 type logStepTypeT =
   | 'compare'
+  | 'found'
+  | 'notFound'
   | 'swap'
   | 'replace'
   | 'reduce'
@@ -10,6 +12,8 @@ type logStepTypeT =
   | 'concat';
 type stepsLogT = {
   type: logStepTypeT;
+  element?:
+    | { type: 'index' | 'value'; value: number };
   elements?:
     | { type: 'index' | 'value'; value: number }[]
     | number[]

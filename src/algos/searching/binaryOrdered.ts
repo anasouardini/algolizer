@@ -6,7 +6,10 @@ const binaryOrdered = (list: number[], target: number, stepsLog: stepsLogT) => {
     const middleIndex = Math.floor(tmpList.length / 2);
 
     stepsLog.push({type: 'compare', elements: [{type: 'value', value: target}, {type: 'index', value: middleIndex}]});
-    if (target == tmpList[middleIndex]) return true;
+    if (target == tmpList[middleIndex]){
+      stepsLog.push({type: 'found', element: {type: 'index', value: middleIndex}});
+      return true;
+    } 
 
     stepsLog.push({type: 'compare', elements: [{type: 'value', value: target}, {type: 'index', value: middleIndex}]});
     if (target < tmpList[middleIndex]) {
@@ -20,6 +23,7 @@ const binaryOrdered = (list: number[], target: number, stepsLog: stepsLogT) => {
     continue;
   }
 
+  stepsLog.push({type: 'notFound'});
   return false;
 };
 
