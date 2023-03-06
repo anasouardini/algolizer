@@ -5,16 +5,12 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
 
   const quickSrt = (
     outputArg: number[],
-    start: number = 0,
+    start: number,
     end: number,
     stepsLog: stepsLogT
   ) => {
     // console.log(stepsLog)
-
-    if (outputArg && end - start < 2) {
-      return [];
-    }
-
+    if (!outputArg || start >= end) {return}
 
     let pivot = end;
     let swapper = start - 1;
@@ -45,6 +41,7 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
       }
     }
     swapper++;
+    pivot = swapper;
     stepsLog.push({
       type: 'swap',
       elements: [
@@ -58,28 +55,30 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
       outputArg[i] ^= outputArg[swapper];
     }
 
+    // eliminating an exception in the steps animation
+    const chunks:{start: number, end:number}[] = [];
+    if(start != pivot){chunks.push({start, end: pivot-1})}
+    if(end != pivot){chunks.push({start: pivot-1, end})}
     stepsLog.push({
       type: 'split',
-      chunks: [
-        { start, end: pivot - 1 },
-        { start: pivot - 1, end },
-      ],
+      chunks,
     });
-    const left = quickSrt(outputArg, start, pivot - 1, stepsLog) as [];
-    const right = quickSrt(outputArg, pivot + 1, end, stepsLog) as [];
+
+    quickSrt(outputArg, start, pivot - 1, stepsLog);
+    quickSrt(outputArg, pivot + 1, end, stepsLog);
 
     stepsLog.push({
       type: 'concat',
       chunks: [
         { start, end: pivot - 1 },
         { start: pivot, end: pivot },
-        { start: pivot - 1, end },
+        { start: pivot + 1, end },
       ],
     });
-    return [...left, outputArg[pivot], ...right];
   };
 
-  return quickSrt(output, 0, output.length - 1, stepsLog);
+  quickSrt(output, 0, output.length - 1, stepsLog);
+  return output;
 };
 
 export default quick;

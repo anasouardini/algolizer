@@ -16,9 +16,9 @@ import interpolation from './searching/interpolation';
   // const input = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
   // const input = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
   // const input = [0, 2, 5, 12, 22, 40, 55, 56];
-  const input = [3, 55, 5, 0, 12, 2, 4, 23, 1];
-  // const output = merge(input);
+  // const input = [3, 55, 5, 0, 12, 2, 4, 23, 1];
   // console.log('input: ', input);
+  // const output = quick(input, []);
   // console.log('output: ', output);
 // };
 
