@@ -50,3 +50,12 @@ body::-webkit-scrollbar-thumb:horizontal
   height: 100%;
   background: rgba(2, 5, 2, .2);
 }
+
+/* .bar:before{ */
+/*   content: attr(data-bar-value); */
+/*   position: absolute; */
+/*   bottom: -1rem; */
+/*   left: 0; */
+/*   font-size: 0.7rem */
+/* } */
+

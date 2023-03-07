@@ -18,12 +18,6 @@ type propsT = {
 export default function AlgoAnimation(props: propsT) {
   const barsRefs = React.useRef<(HTMLElement | null)[]>([]).current;
   let cellRef = React.useRef<HTMLElement | null>(null).current;
-  // LOGGING STEPS
-  // if (props.info.algoName == 'selection') {
-  //   props.stepsLog.forEach((step) => {
-  //     console.log(step.elements);
-  //   });
-  // }
 
   // TODO: colors are not enough
   const stepsActionsColor = {
@@ -249,7 +243,7 @@ export default function AlgoAnimation(props: propsT) {
     // props.stepsLog.forEach((step) => {
     // TODO: manage timing
     const currentStep = props.stepsLog[props.queue.currentStep];
-    console.log(currentStep);
+    // console.log(currentStep);
     // if (props.info.algoName == 'insertion') {
     // }
     stepsActions[currentStep.type].do(currentStep);

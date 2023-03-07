@@ -12,7 +12,7 @@ const genid = (length: number) => {
 };
 
 const randInt = (mi:number, ma:number) => {
-  let min = Math.ceil(mi)+1;
+  let min = Math.ceil(mi);
   let max = Math.floor(ma);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };

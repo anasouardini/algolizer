@@ -27,10 +27,14 @@ export default function Ranking() {
   // TODO: add data regenration method
   // TODO: step duration should be determined from the cell itself
   // TODO: each cell should have it's own controls
+  // TODO: quick sort does not work properly on all data lists, the start and end are not accurate
+  // TODO: fix restart
+  // TODO: rank data from algo perspective and same for algorithms: dataRank/algorithmRank
+  // TODO: show time rank for cells
 
   // my context switcher
   const runSteps = (e) => {
-    console.log(cbQueueRef)
+    // console.log(cbQueueRef)
 
     if (stepperStateRef.running === true) {
       stepperStateRef.running = false;
@@ -57,6 +61,7 @@ export default function Ranking() {
       const stepper = async () => {
         if (stepperStateRef.running === false) {
           console.log('stopping...');
+          e.target.innerText = 'Play All';
           return;
         }
 
@@ -73,7 +78,7 @@ export default function Ranking() {
   };
 
   const oneStepTest = ()=>{
-    Object.values(cbQueueRef)[1].stepCB();
+    Object.values(cbQueueRef)[13].stepCB();
   }
 
   const regenerateCells = (e) => {
