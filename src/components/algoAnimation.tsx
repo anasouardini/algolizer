@@ -177,6 +177,7 @@ export default function AlgoAnimation(props: propsT) {
       do: (step) => {
         for (let i = 0; i < step.chunks.length; i++) {
           // coloring both splited chunks
+          console.log(step)
           const start = step.chunks[i].start;
           const end = step.chunks[i].end;
           for (let k = start; k <= end; k++) {

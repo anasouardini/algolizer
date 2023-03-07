@@ -57,8 +57,8 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
 
     // eliminating an exception in the steps animation
     const chunks:{start: number, end:number}[] = [];
-    if(start != pivot){chunks.push({start, end: pivot-1})}
-    if(end != pivot){chunks.push({start: pivot-1, end})}
+    if(end != pivot){chunks.push({start, end: pivot-1})}
+    if(start != pivot){chunks.push({start: pivot-1, end})}
     stepsLog.push({
       type: 'split',
       chunks,

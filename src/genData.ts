@@ -29,6 +29,15 @@ const sorted = () => {
     return randomInt;
   }, true);
 };
+const reversed = () => {
+  return genList((i: number, list: number[]) => {
+    const max = list?.[i - 1] ?? 50; //using last value as the max
+    // console.log('list', list);
+    const randomInt = randInt( max - 5, max);
+    // console.log(min, min + 10, randomInt);
+    return randomInt;
+  }, true);
+};
 const nearlySorted = () => {
   return genList((i: number, list: number[]) => {
     const ordered = Math.random() > 0.2;
@@ -81,6 +90,7 @@ const uniformed = () => {
 
 export default [
   sorted,
+  reversed,
   nearlySorted,
   halfSorted,
   random,
