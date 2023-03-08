@@ -12,7 +12,12 @@ export default function Ranking() {
   }>({ currentTab: 'sorting', rerender: false });
 
   const cbQueueRef = React.useRef<{
-    [key: string]: { stepCB: () => void; length: number; currentStep: number, stepDuration: number };
+    [key: string]: {
+      stepCB: () => void;
+      length: number;
+      currentStep: number;
+      stepDuration: number;
+    };
   }>({}).current;
   // const domRefs = React.useRef<{ [key: string]: HTMLElement | null }>(
   //   {}
@@ -28,9 +33,9 @@ export default function Ranking() {
   // TODO: step duration should be determined from the cell itself
   // TODO: each cell should have it's own controls
   // TODO: quick sort does not work properly on all data lists, the start and end are not accurate
-  // TODO: fix restart
   // TODO: rank data from algo perspective and same for algorithms: dataRank/algorithmRank
   // TODO: show time rank for cells
+  // TODO: make sure the numbers in the input list are not mutated
 
   // my context switcher
   const runSteps = (e) => {
@@ -77,9 +82,9 @@ export default function Ranking() {
     });
   };
 
-  const oneStepTest = ()=>{
+  const oneStepTest = () => {
     Object.values(cbQueueRef)[13].stepCB();
-  }
+  };
 
   const regenerateCells = (e) => {
     const stateCpy = structuredClone(state);
@@ -138,30 +143,31 @@ export default function Ranking() {
   const tableCells = genCells();
 
   return (
-    <main className={`p-5`}>
-      <table>
+    <main className={`p-5 flex flex-col items-center`}>
+      <div aria-label='controls' className={`flex justify-center mb-8 gap-3`}>
+        <button
+          onClick={oneStepTest}
+          className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+        >
+          step
+        </button>
+        <button
+          onClick={runSteps}
+          className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+        >
+          play All
+        </button>
+        <button
+          onClick={regenerateCells}
+          className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+        >
+          Restart
+        </button>
+      </div>
+      <table className={`text-gray-500`}>
         <thead>
           <tr>
-            <th>
-              <button
-                onClick={oneStepTest}
-                className={`border-blue-400 border-2 rounded-md px-3 py-1`}
-              >
-                step
-              </button>
-              <button
-                onClick={runSteps}
-                className={`border-blue-400 border-2 rounded-md px-3 py-1`}
-              >
-                play All
-              </button>
-              <button
-                onClick={regenerateCells}
-                className={`border-blue-400 border-2 rounded-md px-3 py-1`}
-              >
-                Restart
-              </button>
-            </th>
+            <th></th>
             {algorithms[state.currentTab].map((algo) => {
               return <th key={`${algo.name}`}>{algo.name}</th>;
             })}

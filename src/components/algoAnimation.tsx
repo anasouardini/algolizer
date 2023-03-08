@@ -1,6 +1,7 @@
 import React from 'react';
 import { stepsLogT, logStepTypeT } from '../algos/types';
 import { genid } from '../tools';
+import { FaForward } from 'react-icons/fa';
 
 type propsT = {
   // type: 'searching' | 'sorting';
@@ -29,19 +30,28 @@ export default function AlgoAnimation(props: propsT) {
     shift: ['#999', '#bada55'],
     calc: ['#bada55', '#bada55'],
     push: ['green'],
-    split: ['#bada55', '#999'],
-    concat: ['#bada55', '#bada55'],
+    split: ['#fa8a15', '#4a5a95'],
+    concat: ['#bada55', '#4a5a95'],
   };
 
   type stepsActionsT = {
     [key: string]: {
       do: (step) => void;
-      undo: (step, end: boolean) => void;
+      undo: (step) => void;
     };
   };
 
-  const domUtilities = {
-  };
+  // reset, useEffect holds until the dom is drawn
+  React.useEffect(() => {
+    cellRef?.classList.remove('algoDone');
+    // barsRefs.forEach((bar) => {
+    //   if (bar) {
+    //     bar.style.background = stepsActionsColor.idle[0];
+    //   }
+    // });
+  });
+
+  const domUtilities = {};
 
   const stepsActions: stepsActionsT = {
     compare: {
@@ -60,7 +70,7 @@ export default function AlgoAnimation(props: propsT) {
             stepsActionsColor[step.type][0];
         }
       },
-      undo: (step, end) => {
+      undo: (step) => {
         if (step.elements[0].type == 'index') {
           const firstIndex = step.elements[0].value;
           barsRefs[firstIndex].style.background = stepsActionsColor['idle'][0];
@@ -68,10 +78,6 @@ export default function AlgoAnimation(props: propsT) {
         if (step.elements[1].type == 'index') {
           const secondIndex = step.elements[1].value;
           barsRefs[secondIndex].style.background = stepsActionsColor['idle'][0];
-        }
-
-        if (end) {
-          cellRef?.classList.add('algoDone');
         }
       },
     },
@@ -88,15 +94,11 @@ export default function AlgoAnimation(props: propsT) {
         barsRefs[firstIndex].style.height = barsRefs[secondIndex].style.height;
         barsRefs[secondIndex].style.height = firstElmHeight;
       },
-      undo: (step, end) => {
+      undo: (step) => {
         const firstIndex = step.elements[0].value;
         const secondIndex = step.elements[1].value;
-        barsRefs[firstIndex].style.background = stepsActionsColor['idle'][0];
-        barsRefs[secondIndex].style.background = stepsActionsColor['idle'][0];
-
-        if (end) {
-          cellRef?.classList.add('algoDone');
-        }
+        barsRefs[firstIndex].style.background = stepsActionsColor.idle[0];
+        barsRefs[secondIndex].style.background = stepsActionsColor.idle[0];
       },
     },
     replace: {
@@ -104,15 +106,14 @@ export default function AlgoAnimation(props: propsT) {
         const indexToReplace = step.elements[0].value;
         const valueToReplaceWith = step.elements[1].value;
 
-        barsRefs[indexToReplace].style.background = stepsActionsColor[step.type][0];
+        barsRefs[indexToReplace].style.background =
+          stepsActionsColor[step.type][0];
         barsRefs[indexToReplace].style.height = `${valueToReplaceWith}px`;
       },
-      undo: (step, end) => {
+      undo: (step) => {
         const indexToReplace = step.elements[0].value;
-        barsRefs[indexToReplace].style.background = stepsActionsColor['idle'][0];
-        if (end) {
-          cellRef?.classList.add('algoDone');
-        }
+        barsRefs[indexToReplace].style.background =
+          stepsActionsColor['idle'][0];
       },
     },
     reduce: {
@@ -123,11 +124,7 @@ export default function AlgoAnimation(props: propsT) {
           barsRefs[i].style.background = stepsActionsColor[step.type][0];
         }
       },
-      undo: (step, end) => {
-        if (end) {
-          cellRef?.classList.add('algoDone');
-        }
-      },
+      undo: (step) => {},
     },
     shift: {
       do: (step) => {
@@ -143,41 +140,30 @@ export default function AlgoAnimation(props: propsT) {
         // shifting
         barsRefs[to].style.height = barsRefs[from].style.height;
       },
-      undo: (step, end) => {
+      undo: (step) => {
         const from = step.elements.from;
         const to = step.elements.to;
         barsRefs[from].style.background = stepsActionsColor['idle'][0];
         barsRefs[to].style.background = stepsActionsColor['idle'][0];
-        if (end) {
-          cellRef?.classList.add('algoDone');
-        }
       },
     },
     calc: {
       do: (step) => {
         // TODO: show some calculating animation
       },
-      undo: (step, end) => {
-        if (end) {
-          cellRef?.classList.add('algoDone');
-        }
-      },
+      undo: (step) => {},
     },
     push: {
       do: (step) => {
         // TODO: find a way to visualize both of lists and push to the second list
       },
-      undo: (step, end) => {
-        if (end) {
-          cellRef?.classList.add('algoDone');
-        }
-      },
+      undo: (step) => {},
     },
     split: {
       do: (step) => {
         for (let i = 0; i < step.chunks.length; i++) {
           // coloring both splited chunks
-          console.log(step)
+          // console.log(step);
           const start = step.chunks[i].start;
           const end = step.chunks[i].end;
           for (let k = start; k <= end; k++) {
@@ -185,7 +171,7 @@ export default function AlgoAnimation(props: propsT) {
           }
         }
       },
-      undo: (step, end) => {
+      undo: (step) => {
         for (let i = 0; i < step.chunks.length; i++) {
           // uncoloring both splited chunks
           const start = step.chunks[i].start;
@@ -193,9 +179,6 @@ export default function AlgoAnimation(props: propsT) {
           for (let k = start; k <= end; k++) {
             barsRefs[k].style.background = stepsActionsColor['idle'][0];
           }
-        }
-        if (end) {
-          cellRef?.classList.add('algoDone');
         }
       },
     },
@@ -211,18 +194,15 @@ export default function AlgoAnimation(props: propsT) {
           }
         }
       },
-      undo: (step, end) => {
+      undo: (step) => {
         for (let i = 0; i < step.chunks.length; i++) {
           const start = step.chunks[i].start;
           const end = step.chunks[i].end;
 
-          // uncoloring both concatenated chunks
+          // coloring both concatenated chunks
           for (let k = start; k <= end; k++) {
-            barsRefs[k].style.background = stepsActionsColor['idle'][i];
+            barsRefs[k].style.background = stepsActionsColor['idle'][0];
           }
-        }
-        if (end) {
-          cellRef?.classList.add('algoDone');
         }
       },
     },
@@ -249,11 +229,12 @@ export default function AlgoAnimation(props: propsT) {
     // }
     stepsActions[currentStep.type].do(currentStep);
     setTimeout(() => {
-      let end = false;
-      if (props.queue.length === props.queue.currentStep) {
-        end = true;
+      let end = props.queue.length === props.queue.currentStep;
+
+      if (end) {
+        cellRef?.classList.add('algoDone');
       }
-      stepsActions[currentStep.type].undo(currentStep, end);
+      stepsActions[currentStep.type].undo(currentStep);
     }, props.queue.stepDuration / 1.5);
 
     props.queue.currentStep++;
@@ -261,11 +242,39 @@ export default function AlgoAnimation(props: propsT) {
   // console.log('set cb');
   props.queue.stepCB = step;
 
+  const runSteps = () => {
+    const stepper = async () => {
+      if (props.queue.currentStep >= props.queue.length) {
+        return;
+      }
+      await ((ms) => new Promise((r) => setTimeout(r, ms)))(
+        props.queue.stepDuration
+      );
+      step();
+      stepper();
+    };
+    stepper();
+  };
+
   return (
     <ul
       ref={(el) => (cellRef = el)}
       className={`relative p-1 m-1 text-center h-[5.5rem] border-2 border-green-500 flex gap-1`}
     >
+      <div
+        aria-label='controls'
+        className={`absolute bottom-1 left-1 h-4 flex gap-2`}
+      >
+        <button onClick={step}>
+          <FaForward />
+        </button>
+        <button
+          className={`text-green-600 hover:text-[1.1rem]`}
+          onClick={runSteps}
+        >
+          <FaForward />
+        </button>
+      </div>
       {props.data.map((bar, index) => {
         return (
           <li
