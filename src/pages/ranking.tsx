@@ -26,16 +26,13 @@ export default function Ranking() {
     running: false,
   }).current;
 
-  // run step that run the next step
-
-  // TODO: add stop method
-  // TODO: add data regenration method
-  // TODO: step duration should be determined from the cell itself
-  // TODO: each cell should have it's own controls
-  // TODO: quick sort does not work properly on all data lists, the start and end are not accurate
+  // TODO: add pause control to each cell
+  // TODO: fewUniaue list is not compatible with algorithms
   // TODO: rank data from algo perspective and same for algorithms: dataRank/algorithmRank
   // TODO: show time rank for cells
-  // TODO: make sure the numbers in the input list are not mutated
+  // TODO: make sure the numbers in the input list are not mutated; round the heights and compare the numbers
+  // write a test function for it, it could used whenever you change something.
+  // TODO: add a restarting option without generating new random numbers list
 
   // my context switcher
   const runSteps = (e) => {
@@ -82,8 +79,10 @@ export default function Ranking() {
     });
   };
 
-  const oneStepTest = () => {
-    Object.values(cbQueueRef)[13].stepCB();
+  const oneStep = () => {
+    Object.values(cbQueueRef).forEach((cell)=>{
+      cell.stepCB();
+    })
   };
 
   const regenerateCells = (e) => {
@@ -146,7 +145,7 @@ export default function Ranking() {
     <main className={`p-5 flex flex-col items-center`}>
       <div aria-label='controls' className={`flex justify-center mb-8 gap-3`}>
         <button
-          onClick={oneStepTest}
+          onClick={oneStep}
           className={`border-blue-400 border-2 rounded-md px-3 py-1`}
         >
           step

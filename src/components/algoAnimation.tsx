@@ -218,15 +218,10 @@ export default function AlgoAnimation(props: propsT) {
     }
     // console.log(barsRefs)
     // TODO: find a way to fix the types problem
-    // TODO: the second item in elements might be value|index, add a condition
-    // TODO: add a final step in the algos implementation
-    // TODO: abstract steps actions and add a revert-step acion to it
-    // props.stepsLog.forEach((step) => {
-    // TODO: manage timing
+    // TODO: animate the value comparision
+    // TODO: make sure timing is realistic
+
     const currentStep = props.stepsLog[props.queue.currentStep];
-    // console.log(currentStep);
-    // if (props.info.algoName == 'insertion') {
-    // }
     stepsActions[currentStep.type].do(currentStep);
     setTimeout(() => {
       let end = props.queue.length === props.queue.currentStep;
@@ -279,9 +274,7 @@ export default function AlgoAnimation(props: propsT) {
         return (
           <li
             key={index}
-            data-value={bar}
             ref={(el) => barsRefs.push(el)}
-            data-bar-value={bar}
             style={{
               background: stepsActionsColor.idle[0],
               height: `${bar}px`,
