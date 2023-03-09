@@ -13,7 +13,13 @@ export default function Ranking() {
 
   const cbQueueRef = React.useRef<{
     [key: string]: {
+      info: { datumName: string; algoName: string };
       stepCB: () => void;
+      rankCB: (rankInfo: {
+        time: number;
+        algo2datum: number;
+        datum2algo: number;
+      }) => void;
       length: number;
       running: boolean;
       currentStep: number;
@@ -27,12 +33,53 @@ export default function Ranking() {
     running: false,
   }).current;
 
+  const cellsRankCounters = React.useRef<{
+    time: number;
+    algo2datum: { [key: string]: number };
+    datum2algo: { [key: string]: number };
+  }>({
+    time: 1,
+    algo2datum: {},
+    datum2algo: {},
+  }).current;
+
   // TODO: fewUniaue list is not compatible with algorithms
-  // TODO: rank data from algo perspective and same for algorithms: dataRank/algorithmRank
-  // TODO: show time rank for cells
+  // TODO: add a restarting option without generating new random numbers list
   // TODO: make sure the numbers in the input list are not mutated; round the heights and compare the numbers
   // write a test function for it, it could used whenever you change something.
-  // TODO: add a restarting option without generating new random numbers list
+
+  type rankCellT = (
+    cellInfo: { datumName: string; algoName: string },
+    rankCB: (rankInfo: {
+      time: number;
+      algo2datum: number;
+      datum2algo: number;
+    }) => void
+  ) => void;
+  const rankCell: rankCellT = (cellInfo, rankCB) => {
+    // time rank
+
+    // console.log(cellInfo);
+    rankCB({
+      time: cellsRankCounters.time,
+      algo2datum: cellsRankCounters.algo2datum[cellInfo.algoName],
+      datum2algo: cellsRankCounters.datum2algo[cellInfo.datumName],
+    });
+
+    cellsRankCounters.time++;
+    cellsRankCounters.algo2datum[cellInfo.algoName]++;
+    cellsRankCounters.datum2algo[cellInfo.datumName]++;
+  };
+
+  let cellsDoneCounter = {
+    counter: 0,
+    inc: (e) => {
+      cellsDoneCounter.counter++;
+      if (cellsDoneCounter.counter == Object.keys(cbQueueRef).length) {
+        e.target.innerText = 'Play All';
+      }
+    },
+  };
 
   // my context switcher
   const runSteps = (e) => {
@@ -52,15 +99,6 @@ export default function Ranking() {
 
     // const cellsList = [Object.values(cbQueueRef)[0]];
     // cellsList.forEach((cb) => {
-    let cellsDoneCounter = {
-      counter: 0,
-      inc: () => {
-        cellsDoneCounter.counter++;
-        if (cellsDoneCounter.counter == Object.keys(cbQueueRef).length) {
-          e.target.innerText = 'Play All';
-        }
-      },
-    };
     Object.values(cbQueueRef).forEach((cell) => {
       const stepper = async () => {
         if (cell.running === false) {
@@ -70,7 +108,8 @@ export default function Ranking() {
         }
 
         if (cell.currentStep >= cell.length) {
-          cellsDoneCounter.inc();
+          rankCell(cell.info, cell.rankCB);
+          cellsDoneCounter.inc(e);
           return;
         }
         await ((ms) => new Promise((r) => setTimeout(r, ms)))(
@@ -80,6 +119,11 @@ export default function Ranking() {
         stepper();
       };
 
+      // this should prevent it from replaying when playing from a paused state.
+      // if this logic removed, the ranking will not be accurate
+      if (cell.currentStep >= cell.length) {
+        return;
+      }
       // do not run the cell when it's already running, it'll potentially speed it up.
       if (!cell.running) {
         cell.running = true;
@@ -94,11 +138,13 @@ export default function Ranking() {
     });
   };
 
+  // more like re-render this page component
   const regenerateCells = (e) => {
     // stopping all cells before restarting, or else you have to reload to stop them.
     Object.values(cbQueueRef).forEach((cell) => {
       cell.running = false;
       stepperStateRef.running = false;
+      cellsRankCounters.time = 1;
     });
 
     const stateCpy = structuredClone(state);
@@ -112,6 +158,8 @@ export default function Ranking() {
 
       if (state.currentTab == 'sorting') {
         return algorithms[state.currentTab].map((algo) => {
+          cellsRankCounters.algo2datum[algo.name] = 1;
+
           const stepsLog: stepsLogT = [];
           // console.log(algo.name)
           const output = algo(data, stepsLog);
@@ -119,11 +167,12 @@ export default function Ranking() {
           // console.log(output)
           const cellCbQueueKey = datum.name + '' + algo.name;
           // console.log('gencells')
-          cbQueueRef[cellCbQueueKey] = {};
+          cbQueueRef[cellCbQueueKey] = {
+            info: { datumName: datum.name, algoName: algo.name },
+          };
           return (
             <td key={`${algo.name}-${datum.name}`}>
               <AlgoAnimation
-                info={{ dataName: datum.name, algoName: algo.name }}
                 data={data}
                 stepsLog={stepsLog}
                 queue={cbQueueRef[cellCbQueueKey]}
@@ -150,8 +199,10 @@ export default function Ranking() {
       });
     };
 
-    return genData.reduce((acc: { [key: string]: JSX.Element[] }, dataItem) => {
-      acc[dataItem.name] = mapDataStructureToAlgorithm(dataItem);
+    return genData.reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
+      cellsRankCounters.datum2algo[datum.name] = 1;
+
+      acc[datum.name] = mapDataStructureToAlgorithm(datum);
       return acc;
     }, {});
   };

@@ -24,6 +24,6 @@ import interpolation from './searching/interpolation';
 
 // export default algoTester;
 export default {
-  sorting: [ selection, insertion, bubble, quick, merge ],
+  sorting: [ selection, insertion, bubble, quick ],
   searching: [ linear, binaryOrdered, interpolation, quickSelect],
 };

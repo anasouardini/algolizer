@@ -3,15 +3,22 @@ import { stepsLogT, logStepTypeT } from '../algos/types';
 import { genid } from '../tools';
 import { FaForward } from 'react-icons/fa';
 
+type rankInfoT = {
+  time: number;
+  algo2datum: number;
+  datum2algo: number;
+};
 type propsT = {
   // type: 'searching' | 'sorting';
-  info: { dataName: string; algoName: string };
   stepsLog: stepsLogT;
   data: number[];
   queue: {
+    info: { datumName: string; algoName: string };
     stepCB: () => void;
+    rankCB: (rankInfo: rankInfoT) => void;
     length: number;
     running: boolean;
+    selfRun: boolean;
     currentStep: number;
     stepDuration: number;
   };
@@ -44,15 +51,14 @@ export default function AlgoAnimation(props: propsT) {
 
   // reset, useEffect holds until the dom is drawn
   React.useEffect(() => {
-    cellRef?.classList.remove('algoDone');
+    // console.log(cellRef)
+    cellRef?.querySelector('[data-show-done]')?.remove();
     // barsRefs.forEach((bar) => {
     //   if (bar) {
     //     bar.style.background = stepsActionsColor.idle[0];
     //   }
     // });
   });
-
-  const domUtilities = {};
 
   const stepsActions: stepsActionsT = {
     compare: {
@@ -209,17 +215,17 @@ export default function AlgoAnimation(props: propsT) {
     },
   };
 
+  // do not override the props.queue, just add items
   props.queue.length = props.stepsLog.length;
   props.queue.currentStep = 0;
   props.queue.stepDuration = 200;
-  props.queue.running = false;// not effective when re-rendering after a cell is running
+  props.queue.running = false; // not effective when re-rendering after a cell is running
   const step = () => {
     if (props.queue.currentStep >= props.queue.length) {
       console.log('no more steps');
       return;
     }
     // console.log(barsRefs)
-    // TODO: find a way to fix the types problem
     // TODO: animate the value comparision
     // TODO: make sure timing is realistic
 
@@ -227,10 +233,13 @@ export default function AlgoAnimation(props: propsT) {
     stepsActions[currentStep.type].do(currentStep);
     setTimeout(() => {
       let end = props.queue.length === props.queue.currentStep;
-
       if (end) {
-        cellRef?.classList.add('algoDone');
+        if (props.queue.selfRun) {
+          props.queue.running = false;
+          showDone('✔', '2rem');
+        }
       }
+
       stepsActions[currentStep.type].undo(currentStep);
     }, props.queue.stepDuration / 1.5);
 
@@ -239,11 +248,45 @@ export default function AlgoAnimation(props: propsT) {
   // console.log('set cb');
   props.queue.stepCB = step;
 
+  const showDone = (content:string, size?:string) => {
+    const showRank = document.createElement('div');
+    showRank.setAttribute('data-show-done', '');
+    showRank.setAttribute(
+      'style',
+      ` position: absolute;
+        transform: translate(-0.25rem, -0.25rem);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: ${size ?? '1rem'};
+        width: 100%;
+        height: 100%;
+        background: rgba(2, 5, 2, .2);
+      `
+    );
+    showRank.innerText = content;
+    cellRef?.appendChild(showRank);
+  };
+
+  const rank = (rankInfo: rankInfoT) => {
+    let content = `${rankInfo.time ?? ''}`;
+    content += `${rankInfo.datum2algo ? ' / ' + rankInfo.datum2algo : ''}`;
+    content += `${rankInfo.algo2datum ? ' / ' + rankInfo.algo2datum : ''}`;
+    showDone(content);
+    // console.log(rankInfo);
+    // show info to dom
+  };
+  props.queue.rankCB = rank;
+
   const runSteps = () => {
     props.queue.running = true;
+    props.queue.selfRun = true;
 
     const stepper = async () => {
-      if (props.queue.currentStep >= props.queue.length || !props.queue.running) {
+      if (
+        props.queue.currentStep >= props.queue.length ||
+        !props.queue.running
+      ) {
         return;
       }
 
