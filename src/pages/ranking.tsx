@@ -15,6 +15,7 @@ export default function Ranking() {
     [key: string]: {
       stepCB: () => void;
       length: number;
+      running: boolean;
       currentStep: number;
       stepDuration: number;
     };
@@ -26,7 +27,6 @@ export default function Ranking() {
     running: false,
   }).current;
 
-  // TODO: add pause control to each cell
   // TODO: fewUniaue list is not compatible with algorithms
   // TODO: rank data from algo perspective and same for algorithms: dataRank/algorithmRank
   // TODO: show time rank for cells
@@ -38,15 +38,17 @@ export default function Ranking() {
   const runSteps = (e) => {
     // console.log(cbQueueRef)
 
-    if (stepperStateRef.running === true) {
-      stepperStateRef.running = false;
-      e.target.innerText = 'Play All';
+    const buttonTexts: string[] = ['Play All', 'Pause All'];
+
+    stepperStateRef.running = !stepperStateRef.running;
+    e.target.innerText = buttonTexts[Number(stepperStateRef.running)];
+
+    if (stepperStateRef.running === false) {
+      Object.values(cbQueueRef).forEach((cell) => {
+        cell.running = stepperStateRef.running;
+      });
       return;
     }
-
-    stepperStateRef.running = true;
-
-    e.target.innerText = 'Pause All';
 
     // const cellsList = [Object.values(cbQueueRef)[0]];
     // cellsList.forEach((cb) => {
@@ -59,33 +61,46 @@ export default function Ranking() {
         }
       },
     };
-    Object.values(cbQueueRef).forEach((cb) => {
+    Object.values(cbQueueRef).forEach((cell) => {
       const stepper = async () => {
-        if (stepperStateRef.running === false) {
+        if (cell.running === false) {
           console.log('stopping...');
           e.target.innerText = 'Play All';
           return;
         }
 
-        if (cb.currentStep >= cb.length) {
+        if (cell.currentStep >= cell.length) {
           cellsDoneCounter.inc();
           return;
         }
-        await ((ms) => new Promise((r) => setTimeout(r, ms)))(cb.stepDuration);
-        cb.stepCB();
+        await ((ms) => new Promise((r) => setTimeout(r, ms)))(
+          cell.stepDuration
+        );
+        cell.stepCB();
         stepper();
       };
-      stepper();
+
+      // do not run the cell when it's already running, it'll potentially speed it up.
+      if (!cell.running) {
+        cell.running = true;
+        stepper();
+      }
     });
   };
 
   const oneStep = () => {
-    Object.values(cbQueueRef).forEach((cell)=>{
+    Object.values(cbQueueRef).forEach((cell) => {
       cell.stepCB();
-    })
+    });
   };
 
   const regenerateCells = (e) => {
+    // stopping all cells before restarting, or else you have to reload to stop them.
+    Object.values(cbQueueRef).forEach((cell) => {
+      cell.running = false;
+      stepperStateRef.running = false;
+    });
+
     const stateCpy = structuredClone(state);
     stateCpy.rerender = !stateCpy.rerender;
     setState(stateCpy);
@@ -99,8 +114,9 @@ export default function Ranking() {
         return algorithms[state.currentTab].map((algo) => {
           const stepsLog: stepsLogT = [];
           // console.log(algo.name)
-          algo(data, stepsLog);
-          // console.log('algoRun: ', `[${tabState}]`, datum.name, '=>', algo.name)
+          const output = algo(data, stepsLog);
+          // console.log('algoRun: ', datum.name, '=>', algo.name)
+          // console.log(output)
           const cellCbQueueKey = datum.name + '' + algo.name;
           // console.log('gencells')
           cbQueueRef[cellCbQueueKey] = {};

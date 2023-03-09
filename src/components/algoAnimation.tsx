@@ -11,6 +11,7 @@ type propsT = {
   queue: {
     stepCB: () => void;
     length: number;
+    running: boolean;
     currentStep: number;
     stepDuration: number;
   };
@@ -211,6 +212,7 @@ export default function AlgoAnimation(props: propsT) {
   props.queue.length = props.stepsLog.length;
   props.queue.currentStep = 0;
   props.queue.stepDuration = 200;
+  props.queue.running = false;// not effective when re-rendering after a cell is running
   const step = () => {
     if (props.queue.currentStep >= props.queue.length) {
       console.log('no more steps');
@@ -238,10 +240,13 @@ export default function AlgoAnimation(props: propsT) {
   props.queue.stepCB = step;
 
   const runSteps = () => {
+    props.queue.running = true;
+
     const stepper = async () => {
-      if (props.queue.currentStep >= props.queue.length) {
+      if (props.queue.currentStep >= props.queue.length || !props.queue.running) {
         return;
       }
+
       await ((ms) => new Promise((r) => setTimeout(r, ms)))(
         props.queue.stepDuration
       );
@@ -249,6 +254,10 @@ export default function AlgoAnimation(props: propsT) {
       stepper();
     };
     stepper();
+  };
+
+  const pauseSteps = () => {
+    props.queue.running = false;
   };
 
   return (
@@ -266,6 +275,12 @@ export default function AlgoAnimation(props: propsT) {
         <button
           className={`text-green-600 hover:text-[1.1rem]`}
           onClick={runSteps}
+        >
+          <FaForward />
+        </button>
+        <button
+          className={`text-green-600 hover:text-[1.1rem]`}
+          onClick={pauseSteps}
         >
           <FaForward />
         </button>
