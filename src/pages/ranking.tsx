@@ -26,6 +26,11 @@ export default function Ranking() {
       stepDuration: number;
     };
   }>({}).current;
+
+  let lastRunDataRef = React.useRef<
+    { barsList: number[]; stepsLog: stepsLogT } | {}
+  >({}).current;
+
   // const domRefs = React.useRef<{ [key: string]: HTMLElement | null }>(
   //   {}
   // ).current;
@@ -43,8 +48,8 @@ export default function Ranking() {
     datum2algo: {},
   }).current;
 
-  // TODO: fewUniaue list is not compatible with algorithms
   // TODO: add a restarting option without generating new random numbers list
+  // TODO: fewUnique list is not compatible with algorithms
   // TODO: make sure the numbers in the input list are not mutated; round the heights and compare the numbers
   // write a test function for it, it could used whenever you change something.
 
@@ -134,27 +139,27 @@ export default function Ranking() {
 
   const oneStep = () => {
     Object.values(cbQueueRef).forEach((cell) => {
-      cell.stepCB();
+      if (cell.currentStep < cell.length) {
+        cell.stepCB();
+      }
     });
   };
 
-  // more like re-render this page component
-  const regenerateCells = (e) => {
-    // stopping all cells before restarting, or else you have to reload to stop them.
-    Object.values(cbQueueRef).forEach((cell) => {
-      cell.running = false;
-      stepperStateRef.running = false;
-      cellsRankCounters.time = 1;
-    });
-
-    const stateCpy = structuredClone(state);
-    stateCpy.rerender = !stateCpy.rerender;
-    setState(stateCpy);
+  const drawCell = (cellCbQueueKey: string) => {
+    return (
+      <td key={cellCbQueueKey}>
+        <AlgoAnimation
+          data={lastRunDataRef.barsList}
+          stepsLog={lastRunDataRef.stepsLog}
+          queue={cbQueueRef[cellCbQueueKey]}
+        />
+      </td>
+    );
   };
 
   const genCells = () => {
     const mapDataStructureToAlgorithm = (datum: () => number[]) => {
-      const data = datum();
+      const barsList = datum();
 
       if (state.currentTab == 'sorting') {
         return algorithms[state.currentTab].map((algo) => {
@@ -162,7 +167,7 @@ export default function Ranking() {
 
           const stepsLog: stepsLogT = [];
           // console.log(algo.name)
-          const output = algo(data, stepsLog);
+          const output = algo(barsList, stepsLog);
           // console.log('algoRun: ', datum.name, '=>', algo.name)
           // console.log(output)
           const cellCbQueueKey = datum.name + '' + algo.name;
@@ -170,15 +175,12 @@ export default function Ranking() {
           cbQueueRef[cellCbQueueKey] = {
             info: { datumName: datum.name, algoName: algo.name },
           };
-          return (
-            <td key={`${algo.name}-${datum.name}`}>
-              <AlgoAnimation
-                data={data}
-                stepsLog={stepsLog}
-                queue={cbQueueRef[cellCbQueueKey]}
-              />
-            </td>
-          );
+          lastRunDataRef = {
+            barsList,
+            stepsLog,
+          };
+
+          return drawCell(cellCbQueueKey);
         });
       }
 
@@ -186,7 +188,7 @@ export default function Ranking() {
       // TODO: [opt] get searching vlaue from the user
       return algorithms[state.currentTab].map((algo) => {
         const stepsLog: stepsLogT = [];
-        algo(data, randomTarget, stepsLog);
+        algo(barsList, randomTarget, stepsLog);
         return (
           <td key={`${algo.name}-${datum.name}`}>
             <AlgoAnimation
@@ -208,9 +210,26 @@ export default function Ranking() {
   };
   const tableCells = genCells();
 
+
+  // the name could be "re-render this page component"
+  const regenerateCells = (e) => {
+    // stopping all cells before restarting, or else you have to reload to stop them.
+    Object.values(cbQueueRef).forEach((cell) => {
+      cell.running = false;
+      stepperStateRef.running = false;
+      cellsRankCounters.time = 1;
+    });
+
+    const stateCpy = structuredClone(state);
+    stateCpy.rerender = !stateCpy.rerender;
+    setState(stateCpy);
+  };
+
+
   return (
     <main className={`p-5 flex flex-col items-center`}>
       <div aria-label='controls' className={`flex justify-center mb-8 gap-3`}>
+        {/* icons would be better than text in buttons */}
         <button
           onClick={oneStep}
           className={`border-blue-400 border-2 rounded-md px-3 py-1`}
@@ -228,6 +247,12 @@ export default function Ranking() {
           className={`border-blue-400 border-2 rounded-md px-3 py-1`}
         >
           Restart
+        </button>
+        <button
+          onClick={regenerateCells}
+          className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+        >
+          New Data
         </button>
       </div>
       <table className={`text-gray-500`}>

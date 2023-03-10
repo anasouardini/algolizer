@@ -222,7 +222,11 @@ export default function AlgoAnimation(props: propsT) {
   props.queue.running = false; // not effective when re-rendering after a cell is running
   const step = () => {
     if (props.queue.currentStep >= props.queue.length) {
-      console.log('no more steps');
+      console.log('already done')
+      if(props.queue.running){
+        props.queue.running = false;
+      }
+
       return;
     }
     // console.log(barsRefs)
@@ -235,6 +239,7 @@ export default function AlgoAnimation(props: propsT) {
       let end = props.queue.length === props.queue.currentStep;
       if (end) {
         if (props.queue.selfRun) {
+          props.queue.selfRun = false;
           props.queue.running = false;
           showDone('✔', '2rem');
         }
@@ -248,7 +253,7 @@ export default function AlgoAnimation(props: propsT) {
   // console.log('set cb');
   props.queue.stepCB = step;
 
-  const showDone = (content:string, size?:string) => {
+  const showDone = (content: string, size?: string) => {
     const showRank = document.createElement('div');
     showRank.setAttribute('data-show-done', '');
     showRank.setAttribute(
@@ -310,9 +315,14 @@ export default function AlgoAnimation(props: propsT) {
     >
       <div
         aria-label='controls'
-        className={`absolute bottom-1 left-1 h-4 flex gap-2`}
+        className={`absolute z-10 bottom-1 left-1 h-4 flex gap-2`}
       >
-        <button onClick={step}>
+        <button
+          onClick={() => {
+            props.queue.selfRun = true;
+            step();
+          }}
+        >
           <FaForward />
         </button>
         <button
