@@ -17,4 +17,4 @@ const randInt = (mi:number, ma:number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export { genid, randInt };
+export default { genid, randInt };

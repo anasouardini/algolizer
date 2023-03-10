@@ -1,4 +1,4 @@
-import { randInt } from './tools';
+import Tools from './tools';
 
 const listLengh = 10;
 
@@ -24,7 +24,7 @@ const sorted = () => {
   return genList((i: number, list: number[]) => {
     const min = list?.[i - 1] ?? i; //using last value as the min
     // console.log('list', list);
-    const randomInt = randInt(min ? min : 0, min + 10);
+    const randomInt = Tools.randInt(min ? min : 0, min + 10);
     // console.log(min, min + 10, randomInt);
     return randomInt;
   }, true);
@@ -33,7 +33,7 @@ const reversed = () => {
   return genList((i: number, list: number[]) => {
     const max = list?.[i - 1] ?? 50; //using last value as the max
     // console.log('list', list);
-    const randomInt = randInt( max - 5, max);
+    const randomInt = Tools.randInt( max - 5, max);
     // console.log(min, min + 10, randomInt);
     return randomInt;
   }, true);
@@ -46,7 +46,7 @@ const nearlySorted = () => {
     const min = ordered ? lastInt : i;
     // const min = list?.[i - 1] ?? i;
     // console.log('list', list);
-    const randomInt = randInt(min ? min : 0, min + 10);
+    const randomInt = Tools.randInt(min ? min : 0, min + 10);
     // console.log(min, min + 10, randomInt);
     return randomInt;
   }, true);
@@ -57,14 +57,14 @@ const halfSorted = () => {
     const ordered = Math.random() > 0.5;
     const min = ordered ? list?.[i] ?? i : i;
     // console.log('list', list);
-    const randomInt = randInt(min ? min : 1, 50);
+    const randomInt = Tools.randInt(min ? min : 1, 50);
     // console.log(min, min + 10, randomInt);
     return randomInt;
   }, true);
 };
 const random = () => {
   return genList((i: number, list: number[]) => {
-    return randInt(1, 50);
+    return Tools.randInt(1, 50);
   }, true);
 };
 const fewUnique = () => {
@@ -72,13 +72,13 @@ const fewUnique = () => {
     // TODO: limit the number of duplication to a min and max
     const unique = Math.random() > 0.7;
     const randomInt = unique
-      ? randInt(1, 50)
-      : list[randInt(1, list.length - 1)];
+      ? Tools.randInt(1, 50)
+      : list[Tools.randInt(1, list.length - 1)];
     return randomInt;
   }, false);
 };
 const uniformed = () => {
-  const randGap = randInt(2, 5);
+  const randGap = Tools.randInt(2, 5);
   const sortedList = genList((i: number, list: number[]) => {
     const newNumber = Math.floor(list?.[i-1] ? list[i - 1] + randGap : 10);
     return newNumber;

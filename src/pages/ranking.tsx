@@ -2,14 +2,32 @@ import React from 'react';
 import algorithms from '../algos/index';
 import genData from '../genData';
 import { stepsLogT } from '../algos/types';
-
+import Tools from '../tools';
 import AlgoAnimation from '../components/algoAnimation';
 
 export default function Ranking() {
   const [state, setState] = React.useState<{
     currentTab: 'sorting' | 'searching';
     rerender: boolean;
-  }>({ currentTab: 'sorting', rerender: false });
+    genNew: boolean;
+  }>({ currentTab: 'sorting', rerender: false, genNew: true });
+  const stateActions = {
+    rerender: () => {
+      const stateCpy = structuredClone(state);
+      stateCpy.rerender = !stateCpy.rerender;
+      setState(stateCpy);
+    },
+    oldCells: () => {
+      const stateCpy = structuredClone(state);
+      stateCpy.genNew = false;
+      setState(stateCpy);
+    },
+    newCells: () => {
+      const stateCpy = structuredClone(state);
+      stateCpy.genNew = true;
+      setState(stateCpy);
+    },
+  };
 
   const cbQueueRef = React.useRef<{
     [key: string]: {
@@ -27,9 +45,9 @@ export default function Ranking() {
     };
   }>({}).current;
 
-  let lastRunDataRef = React.useRef<
-    { barsList: number[]; stepsLog: stepsLogT } | {}
-  >({}).current;
+  let lastRunDataRef = React.useRef<{
+    [key: string]: { barsList: number[]; stepsLog: stepsLogT };
+  }>({});
 
   // const domRefs = React.useRef<{ [key: string]: HTMLElement | null }>(
   //   {}
@@ -48,7 +66,6 @@ export default function Ranking() {
     datum2algo: {},
   }).current;
 
-  // TODO: add a restarting option without generating new random numbers list
   // TODO: fewUnique list is not compatible with algorithms
   // TODO: make sure the numbers in the input list are not mutated; round the heights and compare the numbers
   // write a test function for it, it could used whenever you change something.
@@ -147,10 +164,10 @@ export default function Ranking() {
 
   const drawCell = (cellCbQueueKey: string) => {
     return (
-      <td key={cellCbQueueKey}>
+      <td key={`${cellCbQueueKey}-${Tools.genid(10)}`}>
         <AlgoAnimation
-          data={lastRunDataRef.barsList}
-          stepsLog={lastRunDataRef.stepsLog}
+          data={lastRunDataRef.current[cellCbQueueKey].barsList}
+          stepsLog={lastRunDataRef.current[cellCbQueueKey].stepsLog}
           queue={cbQueueRef[cellCbQueueKey]}
         />
       </td>
@@ -175,7 +192,7 @@ export default function Ranking() {
           cbQueueRef[cellCbQueueKey] = {
             info: { datumName: datum.name, algoName: algo.name },
           };
-          lastRunDataRef = {
+          lastRunDataRef.current[cellCbQueueKey] = {
             barsList,
             stepsLog,
           };
@@ -208,23 +225,26 @@ export default function Ranking() {
       return acc;
     }, {});
   };
-  const tableCells = genCells();
 
+  const resetCells = () => {
+    return genData.reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
+      cellsRankCounters.datum2algo[datum.name] = 1;
 
-  // the name could be "re-render this page component"
-  const regenerateCells = (e) => {
-    // stopping all cells before restarting, or else you have to reload to stop them.
-    Object.values(cbQueueRef).forEach((cell) => {
-      cell.running = false;
-      stepperStateRef.running = false;
-      cellsRankCounters.time = 1;
-    });
+      acc[datum.name] = algorithms[state.currentTab].map((algo) => {
+        const cellCbQueueKey = datum.name + '' + algo.name;
+        if (state.currentTab == 'sorting') {
+          return drawCell(cellCbQueueKey);
+        }
 
-    const stateCpy = structuredClone(state);
-    stateCpy.rerender = !stateCpy.rerender;
-    setState(stateCpy);
+        //TODO: reset cells for searching algos
+        return drawCell(cellCbQueueKey);
+      });
+      return acc;
+    }, {});
   };
 
+  let tableCells = state.genNew ? genCells() : resetCells();
+  // console.log(tableCells)
 
   return (
     <main className={`p-5 flex flex-col items-center`}>
@@ -243,13 +263,13 @@ export default function Ranking() {
           play All
         </button>
         <button
-          onClick={regenerateCells}
+          onClick={stateActions.oldCells}
           className={`border-blue-400 border-2 rounded-md px-3 py-1`}
         >
-          Restart
+          Reset
         </button>
         <button
-          onClick={regenerateCells}
+          onClick={stateActions.newCells}
           className={`border-blue-400 border-2 rounded-md px-3 py-1`}
         >
           New Data

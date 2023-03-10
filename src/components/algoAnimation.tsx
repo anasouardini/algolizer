@@ -1,6 +1,6 @@
 import React from 'react';
 import { stepsLogT, logStepTypeT } from '../algos/types';
-import { genid } from '../tools';
+import Tools from '../tools';
 import { FaForward } from 'react-icons/fa';
 
 type rankInfoT = {
@@ -25,6 +25,7 @@ type propsT = {
 };
 
 export default function AlgoAnimation(props: propsT) {
+console.log()
   const barsRefs = React.useRef<(HTMLElement | null)[]>([]).current;
   let cellRef = React.useRef<HTMLElement | null>(null).current;
 
