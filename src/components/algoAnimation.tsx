@@ -29,7 +29,7 @@ console.log()
   const barsRefs = React.useRef<(HTMLElement | null)[]>([]).current;
   let cellRef = React.useRef<HTMLElement | null>(null).current;
 
-  // TODO: colors are not enough
+  // TODO: add indicators of non color friendly steps
   const stepsActionsColor = {
     idle: ['rgb(147 197 253)'],
     compare: ['#eaea15'],
@@ -136,7 +136,6 @@ console.log()
     },
     shift: {
       do: (step) => {
-        // TODO: the "to" index is not needed, direction is enough
         const from = step.elements.from;
         const to = step.elements.to;
 

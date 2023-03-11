@@ -27,48 +27,64 @@ export default function Ranking() {
       stateCpy.genNew = true;
       setState(stateCpy);
     },
+    switchtab: (tab: string) => {
+      const stateCpy = structuredClone(state);
+      stateCpy.currentTab = tab;
+      setState(stateCpy);
+    },
   };
 
-  const cbQueueRef = React.useRef<{
-    [key: string]: {
-      info: { datumName: string; algoName: string };
-      stepCB: () => void;
-      rankCB: (rankInfo: {
-        time: number;
-        algo2datum: number;
-        datum2algo: number;
-      }) => void;
-      length: number;
-      running: boolean;
-      currentStep: number;
-      stepDuration: number;
+  type stateRefT = {
+    buttons: { [key: string]: HTMLButtonElement };
+    cellsStepCbList: {
+      [key: string]: {
+        info: { datumName: string; algoName: string };
+        stepCB: () => void;
+        rankCB: (rankInfo: {
+          time: number;
+          algo2datum: number;
+          datum2algo: number;
+        }) => void;
+        length: number;
+        running: boolean;
+        currentStep: number;
+        stepDuration: number;
+      };
     };
-  }>({}).current;
-
-  let lastRunDataRef = React.useRef<{
-    [key: string]: { barsList: number[]; stepsLog: stepsLogT };
-  }>({});
-
-  // const domRefs = React.useRef<{ [key: string]: HTMLElement | null }>(
-  //   {}
-  // ).current;
-  const stepperStateRef = React.useRef<{ running: boolean }>({
-    running: false,
-  }).current;
-
-  const cellsRankCounters = React.useRef<{
-    time: number;
-    algo2datum: { [key: string]: number };
-    datum2algo: { [key: string]: number };
-  }>({
-    time: 1,
-    algo2datum: {},
-    datum2algo: {},
-  }).current;
-
-  // TODO: fewUnique list is not compatible with algorithms
-  // TODO: make sure the numbers in the input list are not mutated; round the heights and compare the numbers
-  // write a test function for it, it could used whenever you change something.
+    stepperState: { running: boolean };
+    cellsRankCounters: {
+      time: number;
+      algo2datum: { [key: string]: number };
+      datum2algo: { [key: string]: number };
+    };
+    lastRunData: {
+      [key: string]: { barsList: number[]; stepsLog: stepsLogT };
+    };
+  };
+  const stateRef = React.useRef<stateRefT>({
+    buttons: {},
+    cellsStepCbList: {},
+    stepperState: { running: false },
+    cellsRankCounters: {
+      time: 1,
+      algo2datum: {},
+      datum2algo: {},
+    },
+    lastRunData: {},
+  });
+  const stateRefActions = {
+    reset: () => {
+      if (stateRef.current.buttons.play) {
+        stateRef.current.stepperState.running = false;
+        stateRef.current.buttons.play.innerText = 'Play All';
+      }
+    },
+    incRankCounters: (cellInfo: { algoName: string; datumName: string }) => {
+      stateRef.current.cellsRankCounters.time++;
+      stateRef.current.cellsRankCounters.algo2datum[cellInfo.algoName]++;
+      stateRef.current.cellsRankCounters.datum2algo[cellInfo.datumName]++;
+    },
+  };
 
   type rankCellT = (
     cellInfo: { datumName: string; algoName: string },
@@ -79,26 +95,27 @@ export default function Ranking() {
     }) => void
   ) => void;
   const rankCell: rankCellT = (cellInfo, rankCB) => {
-    // time rank
-
     // console.log(cellInfo);
     rankCB({
-      time: cellsRankCounters.time,
-      algo2datum: cellsRankCounters.algo2datum[cellInfo.algoName],
-      datum2algo: cellsRankCounters.datum2algo[cellInfo.datumName],
+      time: stateRef.current.cellsRankCounters.time,
+      algo2datum:
+        stateRef.current.cellsRankCounters.algo2datum[cellInfo.algoName],
+      datum2algo:
+        stateRef.current.cellsRankCounters.datum2algo[cellInfo.datumName],
     });
 
-    cellsRankCounters.time++;
-    cellsRankCounters.algo2datum[cellInfo.algoName]++;
-    cellsRankCounters.datum2algo[cellInfo.datumName]++;
+    stateRefActions.incRankCounters(cellInfo);
   };
 
   let cellsDoneCounter = {
     counter: 0,
     inc: (e) => {
       cellsDoneCounter.counter++;
-      if (cellsDoneCounter.counter == Object.keys(cbQueueRef).length) {
-        e.target.innerText = 'Play All';
+      if (
+        cellsDoneCounter.counter ==
+        Object.keys(stateRef.current.cellsStepCbList).length
+      ) {
+        stateRef.current.buttons.play.innerText = 'Play All';
       }
     },
   };
@@ -109,23 +126,25 @@ export default function Ranking() {
 
     const buttonTexts: string[] = ['Play All', 'Pause All'];
 
-    stepperStateRef.running = !stepperStateRef.running;
-    e.target.innerText = buttonTexts[Number(stepperStateRef.running)];
+    stateRef.current.stepperState.running =
+      !stateRef.current.stepperState.running;
+    stateRef.current.buttons.play.innerText =
+      buttonTexts[Number(stateRef.current.stepperState.running)];
 
-    if (stepperStateRef.running === false) {
-      Object.values(cbQueueRef).forEach((cell) => {
-        cell.running = stepperStateRef.running;
+    if (stateRef.current.stepperState.running === false) {
+      Object.values(stateRef.current.cellsStepCbList).forEach((cell) => {
+        cell.running = stateRef.current.stepperState.running;
       });
       return;
     }
 
     // const cellsList = [Object.values(cbQueueRef)[0]];
     // cellsList.forEach((cb) => {
-    Object.values(cbQueueRef).forEach((cell) => {
+    Object.values(stateRef.current.cellsStepCbList).forEach((cell) => {
       const stepper = async () => {
         if (cell.running === false) {
           console.log('stopping...');
-          e.target.innerText = 'Play All';
+          stateRef.current.buttons.play.innerText = 'Play All';
           return;
         }
 
@@ -155,7 +174,7 @@ export default function Ranking() {
   };
 
   const oneStep = () => {
-    Object.values(cbQueueRef).forEach((cell) => {
+    Object.values(stateRef.current.cellsStepCbList).forEach((cell) => {
       if (cell.currentStep < cell.length) {
         cell.stepCB();
       }
@@ -166,60 +185,47 @@ export default function Ranking() {
     return (
       <td key={`${cellCbQueueKey}-${Tools.genid(10)}`}>
         <AlgoAnimation
-          data={lastRunDataRef.current[cellCbQueueKey].barsList}
-          stepsLog={lastRunDataRef.current[cellCbQueueKey].stepsLog}
-          queue={cbQueueRef[cellCbQueueKey]}
+          data={stateRef.current.lastRunData[cellCbQueueKey].barsList}
+          stepsLog={stateRef.current.lastRunData[cellCbQueueKey].stepsLog}
+          queue={stateRef.current.cellsStepCbList[cellCbQueueKey]}
         />
       </td>
     );
   };
 
   const genCells = () => {
+    // reset
+    stateRefActions.reset();
     const mapDataStructureToAlgorithm = (datum: () => number[]) => {
       const barsList = datum();
 
-      if (state.currentTab == 'sorting') {
-        return algorithms[state.currentTab].map((algo) => {
-          cellsRankCounters.algo2datum[algo.name] = 1;
-
-          const stepsLog: stepsLogT = [];
-          // console.log(algo.name)
-          const output = algo(barsList, stepsLog);
-          // console.log('algoRun: ', datum.name, '=>', algo.name)
-          // console.log(output)
-          const cellCbQueueKey = datum.name + '' + algo.name;
-          // console.log('gencells')
-          cbQueueRef[cellCbQueueKey] = {
-            info: { datumName: datum.name, algoName: algo.name },
-          };
-          lastRunDataRef.current[cellCbQueueKey] = {
-            barsList,
-            stepsLog,
-          };
-
-          return drawCell(cellCbQueueKey);
-        });
-      }
-
-      // TODO: set Random target
-      // TODO: [opt] get searching vlaue from the user
       return algorithms[state.currentTab].map((algo) => {
+        stateRef.current.cellsRankCounters.algo2datum[algo.name] = 1;
         const stepsLog: stepsLogT = [];
-        algo(barsList, randomTarget, stepsLog);
-        return (
-          <td key={`${algo.name}-${datum.name}`}>
-            <AlgoAnimation
-              data={datum()}
-              stepsLog={stepsLog}
-              queue={cbQueueRef}
-            />
-          </td>
-        );
+        const cellCbQueueKey = datum.name + '' + algo.name;
+        stateRef.current.cellsStepCbList[cellCbQueueKey] = {
+          info: { datumName: datum.name, algoName: algo.name },
+        };
+
+        let output;
+        if (state.currentTab == 'sorting') {
+          output = algo(barsList, stepsLog);
+        } else {
+          const randTarget = Tools.randInt(0, datum.length - 1);
+          output = algo(barsList, barsList[randTarget], stepsLog);
+        }
+
+        stateRef.current.lastRunData[cellCbQueueKey] = {
+          barsList,
+          stepsLog,
+        };
+
+        return drawCell(cellCbQueueKey);
       });
     };
 
     return genData.reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
-      cellsRankCounters.datum2algo[datum.name] = 1;
+      stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
 
       acc[datum.name] = mapDataStructureToAlgorithm(datum);
       return acc;
@@ -227,16 +233,17 @@ export default function Ranking() {
   };
 
   const resetCells = () => {
+    // reset play button
+    stateRefActions.reset();
+
+    // resetCells
     return genData.reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
-      cellsRankCounters.datum2algo[datum.name] = 1;
+      stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
 
       acc[datum.name] = algorithms[state.currentTab].map((algo) => {
+        stateRef.current.cellsRankCounters.algo2datum[algo.name] = 1;
         const cellCbQueueKey = datum.name + '' + algo.name;
-        if (state.currentTab == 'sorting') {
-          return drawCell(cellCbQueueKey);
-        }
 
-        //TODO: reset cells for searching algos
         return drawCell(cellCbQueueKey);
       });
       return acc;
@@ -257,6 +264,9 @@ export default function Ranking() {
           step
         </button>
         <button
+          ref={(el) => {
+            stateRef.current.buttons['play'] = el;
+          }}
           onClick={runSteps}
           className={`border-blue-400 border-2 rounded-md px-3 py-1`}
         >
@@ -274,6 +284,16 @@ export default function Ranking() {
         >
           New Data
         </button>
+        <select
+          value={state.currentTab}
+          onChange={(e) => {
+            stateActions.switchtab(e.target.value);
+          }}
+          className={`border-green-600 border-2 rounded-md px-3 py-1`}
+        >
+          <option>sorting</option>
+          <option>searching</option>
+        </select>
       </div>
       <table className={`text-gray-500`}>
         <thead>
