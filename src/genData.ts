@@ -3,7 +3,7 @@ import Tools from './tools';
 const listLengh = 10;
 const maxValue = 50;
 const uniformedStep = maxValue / listLengh;
-const unique = {true: true, false: false}
+const unique = { true: true, false: false };
 
 const genList = (
   cb: (i: number, list: number[]) => number,
@@ -49,7 +49,7 @@ const nearlySorted = () => {
     const min = ordered ? lastInt : i;
     // const min = list?.[i - 1] ?? i;
     // console.log('list', list);
-    const randomInt = Tools.randInt(min ? min : 0, min + uniformedStep * 2);
+    const randomInt = Tools.randInt(min ? min : 1, min + uniformedStep * 2);
     // console.log(min, min + uniformedStep, randomInt);
     return randomInt;
   }, unique.true);
@@ -75,9 +75,10 @@ const fewUnique = () => {
     // TODO: limit the number of duplication to a min and max
     const unique = Math.random() > 0.7;
     // console.log(unique)
-    const randomInt = unique || list.length == 0
-      ? Tools.randInt(1, maxValue)
-      : list[Tools.randInt(0, list.length - 1)];
+    const randomInt =
+      unique || list.length == 0
+        ? Tools.randInt(1, maxValue)
+        : list[Tools.randInt(0, list.length - 1)];
     return randomInt;
   }, unique.false);
 };
@@ -100,20 +101,14 @@ const uniformed = () => {
 // fewUnique data list is causing interpolation
 // -search to loop non-stop
 export default {
-  'sorting':[
-  sorted,
-  reversed,
-  nearlySorted,
-  halfSorted,
-  random,
-  fewUnique,
-  uniformed,
-], 'searching':[
-  sorted,
-  reversed,
-  nearlySorted,
-  halfSorted,
-  random,
-  uniformed,
-],
-}
+  sorting: [
+    sorted,
+    reversed,
+    nearlySorted,
+    halfSorted,
+    random,
+    fewUnique,
+    uniformed,
+  ],
+  searching: [sorted, reversed, nearlySorted, halfSorted, random, uniformed],
+};

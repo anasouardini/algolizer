@@ -5,6 +5,8 @@ import { stepsLogT } from '../algos/types';
 import Tools from '../tools';
 import AlgoAnimation from '../components/algoAnimation';
 
+// TODO: play all button should remove the "done" UI in self-runed cells
+
 export default function Ranking() {
   const [state, setState] = React.useState<{
     currentTab: 'sorting' | 'searching';
@@ -75,13 +77,11 @@ export default function Ranking() {
   const stateRefActions = {
     reset: () => {
       stateRef.current.stepperState.running = false;
-      stateRef.current.cellsStepCbList = {};
+      // stateRef.current.cellsStepCbList = {};
 
       if (stateRef.current.buttons.play) {
         stateRef.current.buttons.play.innerText = 'Play All';
       }
-
-      stateRef.current.cellsStepCbList = {};
     },
     clearDataCache: () => {
       stateRef.current.lastRunData = {};
@@ -269,7 +269,7 @@ export default function Ranking() {
         {/* icons would be better than text in buttons */}
         <button
           onClick={oneStep}
-          className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+          className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
         >
           step
         </button>
@@ -278,19 +278,19 @@ export default function Ranking() {
             stateRef.current.buttons['play'] = el;
           }}
           onClick={runSteps}
-          className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+          className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
         >
           play All
         </button>
         <button
           onClick={stateActions.oldCells}
-          className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+          className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
         >
           Reset
         </button>
         <button
           onClick={stateActions.newCells}
-          className={`border-blue-400 border-2 rounded-md px-3 py-1`}
+          className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
         >
           New Data
         </button>
@@ -301,7 +301,7 @@ export default function Ranking() {
             stateRefActions.reset();
             stateActions.switchtab(e.target.value);
           }}
-          className={`border-green-600 border-2 rounded-md px-3 py-1`}
+          className={`border-green-600 border-2 rounded-md px-3 py-1 capitalize`}
         >
           <option>sorting</option>
           <option>searching</option>
