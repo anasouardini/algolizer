@@ -1,6 +1,9 @@
 import Tools from './tools';
 
 const listLengh = 10;
+const maxValue = 50;
+const uniformedStep = maxValue / listLengh;
+const unique = {true: true, false: false}
 
 const genList = (
   cb: (i: number, list: number[]) => number,
@@ -12,7 +15,7 @@ const genList = (
     // console.log(list)
     // console.log(list.includes(randomInt), randomInt)
     if (!list.includes(randomInt) || !unique) {
-      i ++;
+      i++;
       list.push(randomInt);
       // console.log('rand', randomInt)
     }
@@ -24,19 +27,19 @@ const sorted = () => {
   return genList((i: number, list: number[]) => {
     const min = list?.[i - 1] ?? i; //using last value as the min
     // console.log('list', list);
-    const randomInt = Tools.randInt(min ? min : 0, min + 10);
-    // console.log(min, min + 10, randomInt);
+    const randomInt = Tools.randInt(min ? min : 0, min + uniformedStep * 2);
+    // console.log(min, min + uniformedStep, randomInt);
     return randomInt;
-  }, true);
+  }, unique.true);
 };
 const reversed = () => {
   return genList((i: number, list: number[]) => {
-    const max = list?.[i - 1] ?? 50; //using last value as the max
+    const max = list?.[i - 1] ?? maxValue; //using last value as the max
     // console.log('list', list);
-    const randomInt = Tools.randInt( max - 5, max);
-    // console.log(min, min + 10, randomInt);
+    const randomInt = Tools.randInt(max - uniformedStep, max);
+    // console.log(min, min + uniformedStep, randomInt);
     return randomInt;
-  }, true);
+  }, unique.true);
 };
 const nearlySorted = () => {
   return genList((i: number, list: number[]) => {
@@ -46,10 +49,10 @@ const nearlySorted = () => {
     const min = ordered ? lastInt : i;
     // const min = list?.[i - 1] ?? i;
     // console.log('list', list);
-    const randomInt = Tools.randInt(min ? min : 0, min + 10);
-    // console.log(min, min + 10, randomInt);
+    const randomInt = Tools.randInt(min ? min : 0, min + uniformedStep * 2);
+    // console.log(min, min + uniformedStep, randomInt);
     return randomInt;
-  }, true);
+  }, unique.true);
 };
 // TODO: make it litterally is it sounds: first half sorted
 const halfSorted = () => {
@@ -57,35 +60,41 @@ const halfSorted = () => {
     const ordered = Math.random() > 0.5;
     const min = ordered ? list?.[i] ?? i : i;
     // console.log('list', list);
-    const randomInt = Tools.randInt(min ? min : 1, 50);
-    // console.log(min, min + 10, randomInt);
+    const randomInt = Tools.randInt(min ? min : 1, maxValue);
+    // console.log(min, min + uniformedStep, randomInt);
     return randomInt;
-  }, true);
+  }, unique.true);
 };
 const random = () => {
   return genList((i: number, list: number[]) => {
-    return Tools.randInt(1, 50);
-  }, true);
+    return Tools.randInt(1, maxValue);
+  }, unique.true);
 };
 const fewUnique = () => {
   return genList((i: number, list: number[]) => {
     // TODO: limit the number of duplication to a min and max
     const unique = Math.random() > 0.7;
-    const randomInt = unique
-      ? Tools.randInt(1, 50)
-      : list[Tools.randInt(1, list.length - 1)];
+    // console.log(unique)
+    const randomInt = unique || list.length == 0
+      ? Tools.randInt(1, maxValue)
+      : list[Tools.randInt(0, list.length - 1)];
     return randomInt;
-  }, false);
+  }, unique.false);
 };
 const uniformed = () => {
-  const randGap = Tools.randInt(2, 5);
+  const randGap = Tools.randInt(2, uniformedStep);
   const sortedList = genList((i: number, list: number[]) => {
-    const newNumber = Math.floor(list?.[i-1] ? list[i - 1] + randGap : 10);
+    const newNumber = Math.floor(
+      list?.[i - 1] ? list[i - 1] + randGap : uniformedStep * 2
+    );
     return newNumber;
-  }, true);
+  }, unique.true);
 
   // return shuffled list
-  return sortedList.sort(()=>0.5-Math.random());
+  return sortedList.sort(() => {
+    const fiftyChance = 0.5 - Math.random();
+    return fiftyChance; // either 0 or non-0
+  });
 };
 
 export default [
