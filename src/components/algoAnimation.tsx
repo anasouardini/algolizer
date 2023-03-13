@@ -8,6 +8,7 @@ type rankInfoT = {
   algo2datum: number;
   datum2algo: number;
 };
+
 type propsT = {
   // type: 'searching' | 'sorting';
   stepsLog: stepsLogT;
@@ -25,7 +26,6 @@ type propsT = {
 };
 
 export default function AlgoAnimation(props: propsT) {
-console.log()
   const barsRefs = React.useRef<(HTMLElement | null)[]>([]).current;
   let cellRef = React.useRef<HTMLElement | null>(null).current;
 
@@ -41,6 +41,7 @@ console.log()
     push: ['green'],
     split: ['#fa8a15', '#4a5a95'],
     concat: ['#bada55', '#4a5a95'],
+    found: ['#8aba95', '#8aba95'],
   };
 
   type stepsActionsT = {
@@ -213,6 +214,21 @@ console.log()
         }
       },
     },
+    found: {
+      do: (step) => {
+        // console.log(props.queue.info.algoName, props.queue.info.datumName, step.element.value)
+        barsRefs[step.element.value].style.background = stepsActionsColor[step.type][0];
+      },
+      undo: (step) => {
+        // barsRefs[step.element.value].style.background = stepsActionsColor['idle'][0];
+      },
+    },
+    notFound: {
+      do: (step) => {
+      },
+      undo: (step) => {
+      },
+    },
   };
 
   // do not override the props.queue, just add items
@@ -221,9 +237,12 @@ console.log()
   props.queue.stepDuration = 200;
   props.queue.running = false; // not effective when re-rendering after a cell is running
   const step = () => {
-    if (props.queue.currentStep >= props.queue.length) {
-      console.log('already done')
-      if(props.queue.running){
+    let end = props.queue.currentStep >= props.queue.length;
+    if (end) {
+      console.log('already done');
+
+      // just in case
+      if (props.queue.running) {
         props.queue.running = false;
       }
 
@@ -234,6 +253,7 @@ console.log()
     // TODO: make sure timing is realistic
 
     const currentStep = props.stepsLog[props.queue.currentStep];
+    // console.log(currentStep);
     stepsActions[currentStep.type].do(currentStep);
     setTimeout(() => {
       let end = props.queue.length === props.queue.currentStep;
@@ -311,7 +331,8 @@ console.log()
   return (
     <ul
       ref={(el) => (cellRef = el)}
-      className={`relative p-1 m-1 text-center h-[5.5rem] border-2 border-green-500 flex gap-1`}
+      className={`relative p-1 m-1 text-center h-[5.5rem]
+                  border-2 border-green-500 flex gap-1`}
     >
       <div
         aria-label='controls'
