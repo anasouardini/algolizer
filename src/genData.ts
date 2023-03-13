@@ -97,7 +97,10 @@ const uniformed = () => {
   });
 };
 
-export default [
+// fewUnique data list is causing interpolation
+// -search to loop non-stop
+export default {
+  'sorting':[
   sorted,
   reversed,
   nearlySorted,
@@ -105,4 +108,12 @@ export default [
   random,
   fewUnique,
   uniformed,
-];
+], 'searching':[
+  sorted,
+  reversed,
+  nearlySorted,
+  halfSorted,
+  random,
+  uniformed,
+],
+}

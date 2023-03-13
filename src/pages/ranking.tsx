@@ -76,20 +76,15 @@ export default function Ranking() {
     reset: () => {
       stateRef.current.stepperState.running = false;
       stateRef.current.cellsStepCbList = {};
-      Object.keys(stateRef.current.cellsRankCounters).forEach((counterKey) => {
-        let counter = stateRef.current.cellsRankCounters[counterKey];
-        if (typeof counter == 'object') {
-          counter = {};
-        } else {
-          // it's a primitive
-          stateRef.current.cellsRankCounters[counterKey] = 1;
-        }
-      });
+
       if (stateRef.current.buttons.play) {
         stateRef.current.buttons.play.innerText = 'Play All';
       }
 
       stateRef.current.cellsStepCbList = {};
+    },
+    clearDataCache: () => {
+      stateRef.current.lastRunData = {};
     },
     incRankCounters: (cellInfo: { algoName: string; datumName: string }) => {
       stateRef.current.cellsRankCounters.time++;
@@ -209,7 +204,7 @@ export default function Ranking() {
     // reset
     stateRefActions.reset();
 
-    return genData.reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
+    return genData[state.currentTab].reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
       stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
 
       const barsList = datum();
@@ -220,7 +215,6 @@ export default function Ranking() {
       }
 
       acc[datum.name] = algorithms[state.currentTab].map((algo) => {
-console.log('looping through algos')
         stateRef.current.cellsRankCounters.algo2datum[algo.name] = 1;
         const stepsLog: stepsLogT = [];
         const cellCbQueueKey = datum.name + '' + algo.name;
@@ -253,7 +247,7 @@ console.log('looping through algos')
     stateRefActions.reset();
 
     // resetCells
-    return genData.reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
+    return genData[state.currentTab].reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
       stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
 
       acc[datum.name] = algorithms[state.currentTab].map((algo) => {
@@ -303,6 +297,7 @@ console.log('looping through algos')
         <select
           value={state.currentTab}
           onChange={(e) => {
+            stateRefActions.clearDataCache();
             stateRefActions.reset();
             stateActions.switchtab(e.target.value);
           }}
