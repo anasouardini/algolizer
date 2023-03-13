@@ -53,7 +53,7 @@ const quickSelect = (list: number[], target: number, stepsLog: stepsLogT) => {
     stepsLog.push({
       type: 'compare',
       elements: [
-        { type: 'index', value: target },
+        { type: 'value', value: target },
         { type: 'index', value: swapper },
       ],
     });
@@ -68,7 +68,7 @@ const quickSelect = (list: number[], target: number, stepsLog: stepsLogT) => {
     stepsLog.push({
       type: 'compare',
       elements: [
-        { type: 'index', value: target },
+        { type: 'value', value: target },
         { type: 'index', value: swapper },
       ],
     });
