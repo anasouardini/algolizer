@@ -74,10 +74,22 @@ export default function Ranking() {
   });
   const stateRefActions = {
     reset: () => {
+      stateRef.current.stepperState.running = false;
+      stateRef.current.cellsStepCbList = {};
+      Object.keys(stateRef.current.cellsRankCounters).forEach((counterKey) => {
+        let counter = stateRef.current.cellsRankCounters[counterKey];
+        if (typeof counter == 'object') {
+          counter = {};
+        } else {
+          // it's a primitive
+          stateRef.current.cellsRankCounters[counterKey] = 1;
+        }
+      });
       if (stateRef.current.buttons.play) {
-        stateRef.current.stepperState.running = false;
         stateRef.current.buttons.play.innerText = 'Play All';
       }
+
+      stateRef.current.cellsStepCbList = {};
     },
     incRankCounters: (cellInfo: { algoName: string; datumName: string }) => {
       stateRef.current.cellsRankCounters.time++;
@@ -196,10 +208,19 @@ export default function Ranking() {
   const genCells = () => {
     // reset
     stateRefActions.reset();
-    const mapDataStructureToAlgorithm = (datum: () => number[]) => {
+
+    return genData.reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
+      stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
+
       const barsList = datum();
 
-      return algorithms[state.currentTab].map((algo) => {
+      let randTarget = -1;
+      if (state.currentTab == 'searching') {
+        randTarget = barsList[Tools.randInt(0, datum.length - 1)];
+      }
+
+      acc[datum.name] = algorithms[state.currentTab].map((algo) => {
+console.log('looping through algos')
         stateRef.current.cellsRankCounters.algo2datum[algo.name] = 1;
         const stepsLog: stepsLogT = [];
         const cellCbQueueKey = datum.name + '' + algo.name;
@@ -211,8 +232,8 @@ export default function Ranking() {
         if (state.currentTab == 'sorting') {
           output = algo(barsList, stepsLog);
         } else {
-          const randTarget = Tools.randInt(0, datum.length - 1);
-          output = algo(barsList, barsList[randTarget], stepsLog);
+          // console.log(randTarget)
+          output = algo(barsList, randTarget, stepsLog);
         }
 
         stateRef.current.lastRunData[cellCbQueueKey] = {
@@ -222,12 +243,7 @@ export default function Ranking() {
 
         return drawCell(cellCbQueueKey);
       });
-    };
 
-    return genData.reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
-      stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
-
-      acc[datum.name] = mapDataStructureToAlgorithm(datum);
       return acc;
     }, {});
   };
@@ -287,6 +303,7 @@ export default function Ranking() {
         <select
           value={state.currentTab}
           onChange={(e) => {
+            stateRefActions.reset();
             stateActions.switchtab(e.target.value);
           }}
           className={`border-green-600 border-2 rounded-md px-3 py-1`}
