@@ -7,12 +7,12 @@
 body::scrollbar,
 .scrollbar::scrollbar {
     width: 6px;
-    background-color: rgb(249 115 22);
+    background-color: rgba(55, 99, 232, 0.9);
 }
 body::scrollbar:horizontal,
 .scrollbar::scrollbar:horizontal {
     width: 6px;
-    background-color: rgb(249 115 22);
+    background-color: rgba(55, 99, 232, 0.9);
 }
 
 body::-webkit-scrollbar,
@@ -27,10 +27,10 @@ body::-webkit-scrollbar:horizontal,
 body::-webkit-scrollbar-thumb,
 .scrollbar::-webkit-scrollbar-thumb {
     border-radius: 5px;
-    background-color: rgb(249 115 22);
+    background-color: rgba(55, 99, 232, 0.9);
 }
 body::-webkit-scrollbar-thumb:horizontal
 .scrollbar::-webkit-scrollbar-thumb {
     border-radius: 5px;
-    background-color: rgb(249 115 22);
+    background-color: rgba(55, 99, 232, 0.9);
 }
