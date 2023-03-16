@@ -25,8 +25,8 @@ type propsT = {
     time: { real: number[]; bigO: number[] };
     space: { real: number[]; bigO: number[] };
   };
-  colors: string[];
   title: string;
+  equations: string[];
 };
 export default function Notations(props: propsT) {
   type notationsT = 'real' | 'bigO';
@@ -50,11 +50,11 @@ export default function Notations(props: propsT) {
       },
       title: {
         display: true,
-        text: props.title + ' algorithm',
+        text: props.title,
       },
     },
   };
-  
+
   const globalChartData = {
     labels: Array(props.xLength).fill(''),
     datasets: Object.keys(props.notations)
@@ -62,10 +62,16 @@ export default function Notations(props: propsT) {
         return Object.keys(props.notations[notationTypeKey]).map(
           (notationSubTypeKey, subTypeIndex) => {
             // console.log(props.notations[notationTypeKey][notationSubTypeKey])
+            const notation: {
+              equation: string;
+              color: string;
+              notationSteps: number[];
+            } = props.notations[notationTypeKey][notationSubTypeKey];
+            // console.log(notation);
             const dataset = {
               label: `${notationTypeKey}-${notationSubTypeKey}`,
-              data: props.notations[notationTypeKey][notationSubTypeKey],
-              backgroundColor: props.colors[typeIndex][subTypeIndex],
+              data: notation.notationSteps,
+              backgroundColor: notation.color,
               tension: 0.3,
             };
             // console.log(dataset);
@@ -75,20 +81,14 @@ export default function Notations(props: propsT) {
       })
       .flat(),
   };
+  // console.log(globalChartData)
 
   const switchNotation = (e) => {
     stateActions.switchNotation(e.target.value);
   };
 
   return (
-    <div aria-label='chart'>
-      {/*
-      <select onChange={switchNotation} value={state.currentNotation}>
-        {Object.keys(props.notations).map((notation) => {
-          return <option key={notation}>{notation}</option>;
-        })}
-      </select>
-*/}
+    <div aria-label='chart' className={`w-[500px]`}>
       <Line options={globalChartOptions} data={globalChartData} />
     </div>
   );
