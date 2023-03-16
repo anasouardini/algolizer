@@ -66,15 +66,6 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
 
     quickSrt(outputArg, start, pivot - 1, stepsLog);
     quickSrt(outputArg, pivot + 1, end, stepsLog);
-
-    stepsLog.push({
-      type: 'concat',
-      chunks: [
-        { start, end: pivot - 1 },
-        { start: pivot, end: pivot },
-        { start: pivot + 1, end },
-      ],
-    });
   };
 
   quickSrt(output, 0, output.length - 1, stepsLog);
