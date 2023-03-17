@@ -1,5 +1,7 @@
 import {stepsLogT} from '../types'
 
+// TODO: use start and end instead of slice
+// TODO: refactor this miss
 const binaryOrdered = (list: number[], target: number, stepsLog: stepsLogT) => {
   let tmpList = [...list];
   while (tmpList.length) {

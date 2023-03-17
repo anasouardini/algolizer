@@ -224,7 +224,13 @@ export default function Ranking() {
 
         let output;
         if (state.currentTab == 'sorting') {
+
+          // const start = Date.now();
           output = algo(barsList, stepsLog);
+          // const end = Date.now();
+          // const duration = end - start;
+          // console.log(algo.name, datum.name, start, end, duration)
+
         } else {
           // console.log(randTarget)
           output = algo(barsList, randTarget, stepsLog);

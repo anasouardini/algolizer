@@ -9,7 +9,6 @@ import quickSelect from './searching/quickSelect';
 import interpolation from './searching/interpolation';
 
 // TODO: visualize memory consumption
-// TODO: use destructuring to swap items
 
 // TESTING
 // const algoTester = () => {

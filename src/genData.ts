@@ -54,7 +54,8 @@ const nearlySorted = () => {
     return randomInt;
   }, unique.true);
 };
-// TODO: make it litterally is it sounds: first half sorted
+
+// TODO: make it litterally as it sounds: first half sorted
 const halfSorted = () => {
   return genList((i: number, list: number[]) => {
     const ordered = Math.random() > 0.5;
