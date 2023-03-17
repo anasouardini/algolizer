@@ -22,7 +22,23 @@ ChartJS.register(
 type propsT = {
   xLength: number;
   notations: {
-    time: { real: number[]; bigO: number[] };
+    time: {
+      worst: {
+        color: string;
+        equation: { real: string; bigO: string };
+        notationSteps: { real: number[]; bigO: number[] };
+      };
+      average: {
+        color: string;
+        equation: { real: string; bigO: string };
+        notationSteps: { real: number[]; bigO: number[] };
+      };
+      best: {
+        color: string;
+        equation: { real: string; bigO: string };
+        notationSteps: { real: number[]; bigO: number[] };
+      };
+    };
     space: { real: number[]; bigO: number[] };
   };
   title: string;
@@ -55,31 +71,43 @@ export default function Notations(props: propsT) {
     },
   };
 
-  const globalChartData = {
-    labels: Array(props.xLength).fill(''),
-    datasets: Object.keys(props.notations)
-      .map((notationTypeKey: notationsT, typeIndex) => {
-        return Object.keys(props.notations[notationTypeKey]).map(
-          (notationSubTypeKey, subTypeIndex) => {
-            // console.log(props.notations[notationTypeKey][notationSubTypeKey])
-            const notation: {
-              equation: string;
-              color: string;
-              notationSteps: number[];
-            } = props.notations[notationTypeKey][notationSubTypeKey];
-            // console.log(notation);
-            const dataset = {
-            label: `${notationSubTypeKey} ${notationTypeKey}: ${notation.equation}`,
-              data: notation.notationSteps,
-              backgroundColor: notation.color,
-              tension: 0.3,
-            };
-            // console.log(dataset);
-            return dataset;
+  const genDatasets = () => {
+    // console.log(props.notations);
+    const dataSets = Object.keys(props.notations)
+      .map((complexityType: notationsT, typeIndex) => {
+        return Object.keys(props.notations[complexityType]).map(
+          (notationScenario) => {
+            return Object.keys(
+              props.notations[complexityType][notationScenario]
+            ).map((realOrBigO) => {
+              // console.log(props.notations[notationTypeKey][notationSubTypeKey])
+              const notation: {
+                equation: string;
+                color: string;
+                notationSteps: number[];
+              } = props.notations[complexityType][notationScenario][realOrBigO];
+                // console.log(notation);
+              const dataset = {
+                label: `${notationScenario} ${complexityType} ${realOrBigO}: ${notation.equation}`,
+                data: notation.notationSteps,
+                backgroundColor: notation.color,
+                tension: 0.3,
+              };
+              // console.log(dataset);
+              return dataset;
+            });
           }
         );
       })
-      .flat(),
+      .flat(2);
+
+    // console.log(dataSets)
+    return dataSets;
+  };
+
+  const globalChartData = {
+    labels: Array(props.xLength).fill(''),
+    datasets: genDatasets(),
   };
   // console.log(globalChartData)
 
@@ -88,7 +116,7 @@ export default function Notations(props: propsT) {
   };
 
   return (
-    <div aria-label='chart' className={`w-[500px]`}>
+    <div aria-label='chart' className={`w-[600px]`}>
       <Line options={globalChartOptions} data={globalChartData} />
     </div>
   );
