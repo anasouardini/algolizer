@@ -69,7 +69,7 @@ export default function Notations(props: propsT) {
             } = props.notations[notationTypeKey][notationSubTypeKey];
             // console.log(notation);
             const dataset = {
-              label: `${notationTypeKey}-${notationSubTypeKey}`,
+            label: `${notationSubTypeKey} ${notationTypeKey}: ${notation.equation}`,
               data: notation.notationSteps,
               backgroundColor: notation.color,
               tension: 0.3,
