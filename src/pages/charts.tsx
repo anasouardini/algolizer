@@ -23,7 +23,7 @@ export default function Charts() {
     },
   };
 
-  // TODO: show equation used
+  // TODO: add average and best case scenarios.
 
   type equationsT = {
     [key: string]: {
@@ -36,51 +36,51 @@ export default function Charts() {
   const equations: equationsT = {
     sorting: {
       selection: {
-        space: { bigO: '1', real: '2' },
+        space: { bigO: '1', real: '1' },
         time: {
           bigO: 'Math.pow(x, 2)',
-          real: 'x+1 + ((x * (x + 1)) / 2)',
+          real: 'x-1 + (((x-1) * ((x-1) + 1)) / 2)',
         },
       },
       insertion: {
-        space: { bigO: '1', real: '1+3' },
+        space: { bigO: '1', real: '1' },
         time: {
           bigO: 'Math.pow(x, 2)',
-          real: 'x+1 + ((x * (x + 1)) / 2)',
+          real: 'x-1 + (((x-1) * ((x-1) + 1)) / 2)',
         },
       },
       bubble: {
-        space: { bigO: '1', real: '1+3' },
+        space: { bigO: '1', real: '1' },
         time: {
           bigO: 'Math.pow(x, 2)',
-          real: '(x * (x + 1)) / 2',
+          real: '((x-1) * ((x-1) + 1)) / 2',
         },
       },
       quick: {
-        space: { bigO: 'Math.log(x)', real: 'Math.log(x)+5' },
-        time: { bigO: 'Math.pow(x, 2)', real: 'Math.pow((x-1), 2)' },
+        space: { bigO: 'Math.log(x)', real: 'x/2' },
+        time: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
       },
       merge: {
-        space: { bigO: 'x', real: 'x+5' },
+        space: { bigO: 'x', real: 'x + Math.log(x)' },
         time: { bigO: 'x*Math.log(x)', real: 'x*Math.log(x)' },
       },
     },
     searching: {
       linear: {
-        space: { bigO: '1', real: '1+5' },
-        time: { bigO: 'x', real: 'x+5' },
+        space: { bigO: '1', real: '1' },
+        time: { bigO: 'x', real: 'x' },
       },
       binary: {
-        space: { bigO: '1', real: '1+5' },
-        time: { bigO: 'Math.log(x)', real: 'Math.log(x)+5' },
+        space: { bigO: '1', real: '1' },
+        time: { bigO: 'Math.log(x)', real: 'Math.log(x)' },
       },
       interpolation: {
-        space: { bigO: '1', real: '1+5' },
-        time: { bigO: 'x', real: 'x+5' },
+        space: { bigO: '1', real: '1' },
+        time: { bigO: 'x', real: 'x' },
       },
       quickSelect: {
-        space: { bigO: 'Math.log(x)', real: 'x*Math.log(x)' },
-        time: { bigO: 'Math.log(x)', real: 'x*Math.log(x)' },
+        space: { bigO: 'Math.log(x)', real: 'x/2' },
+        time: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
       },
     },
   };
@@ -105,24 +105,31 @@ export default function Charts() {
         between the real time complexity and the conventional bigO version is
         getting diminished
       </p>
-      <div aria-label='controls' className={`my-6 flex gap-5`}>
-        <select
-          onChange={(e) => {
-            stateActions.changeTab(e.target.value);
-          }}
-        >
-          <option>sorting</option>
-          <option>searching</option>
-        </select>
-        <input
-          type='range'
-          min={0}
-          max={100}
-          onChange={(e) => {
-            stateActions.changeTime(parseInt(e.target.value));
-          }}
-          className={`accent-blue-500`}
-        />
+      {/* don't miss with controls paddings, css is finicky. */}
+      <div aria-label='controls' className={`my-6 flex align-center gap-5`}>
+        <label className={`py-1`}>
+          <select
+            onChange={(e) => {
+              stateActions.changeTab(e.target.value);
+            }}
+            className={`border-2 border-blue-400 rounded py-1`}
+          >
+            <option>sorting</option>
+            <option>searching</option>
+          </select>
+        </label>
+        <label className={`flex text-center py-2`}>
+          X-Axis:&nbsp;
+          <input
+            type='range'
+            min={0}
+            max={100}
+            onChange={(e) => {
+              stateActions.changeTime(parseInt(e.target.value));
+            }}
+            className={`accent-blue-500`}
+          />
+        </label>
       </div>
       <div
         key={state.currentTab}
@@ -139,14 +146,21 @@ export default function Charts() {
               (notationSubTypeKey) => {
                 const equationString =
                   notationTypes[notationTypeKey][notationSubTypeKey];
-                let colorOpacity = .9;
-                if(notationSubTypeKey == 'real'){colorOpacity = .5}
+                let colorOpacity = 0.9;
+                if (notationSubTypeKey == 'real') {
+                  colorOpacity = 0.5;
+                }
                 let notationColor = `rgba(55, 99, 232, ${colorOpacity})`;
-                if(notationTypeKey == 'time'){notationColor = `rgba(255, 99, 132, ${colorOpacity})`}
+                if (notationTypeKey == 'time') {
+                  notationColor = `rgba(255, 99, 132, ${colorOpacity})`;
+                }
 
-                chartNotationsSteps[notationTypeKey][notationSubTypeKey] ={equation:'', color: notationColor, notationSteps: []}
-                chartNotationsSteps[notationTypeKey][notationSubTypeKey].notationSteps =
-                  genNotationSteps(equationString);
+                chartNotationsSteps[notationTypeKey][notationSubTypeKey] = {
+                  equation: equationString,
+                  color: notationColor,
+                  notationSteps: genNotationSteps(equationString),
+                };
+
                 equationStringList.push(equationString);
               }
             );
@@ -157,7 +171,6 @@ export default function Charts() {
               key={Tools.genid(10)}
               xLength={state.timeAxis}
               title={equationCategory}
-              equations={equationStringList}
               notations={chartNotationsSteps}
             />
           );
