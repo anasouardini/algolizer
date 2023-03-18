@@ -6,7 +6,7 @@ export default function Charts() {
   const [state, setState] = React.useState<{
     timeAxis: number;
     currentTab: 'sorting' | 'searching';
-    chartLabelsFilter: {[key:string]: boolean};
+    chartLabelsFilter: { [key: string]: boolean };
   }>({
     timeAxis: 10,
     currentTab: 'sorting',
@@ -23,14 +23,12 @@ export default function Charts() {
       stateCpy.currentTab = val;
       setState(stateCpy);
     },
-    changeLabelsFilter: ({name, show}: {name:string, show:boolean}) => {
+    changeLabelsFilter: ({ name, show }: { name: string; show: boolean }) => {
       const stateCpy = structuredClone(state);
       stateCpy.chartLabelsFilter[name] = show;
       setState(stateCpy);
     },
   };
-
-  // TODO: add average and best case scenarios.
 
   type equationScenariosT = {
     worst: { bigO: string; real: string | number[] };
@@ -84,8 +82,8 @@ export default function Charts() {
             real: 'x-1 + (((x-1) * ((x-1) + 1)) / 2)',
           },
           best: {
-            bigO: 'Math.pow(x, 2)',
-            real: 'x-1 + (((x-1) * ((x-1) + 1)) / 2)',
+            bigO: 'x',
+            real: 'x-1',
           },
         },
       },
@@ -105,33 +103,33 @@ export default function Charts() {
             real: '((x-1) * ((x-1) + 1)) / 2',
           },
           best: {
-            bigO: 'Math.pow(x, 2)',
-            real: '((x-1) * ((x-1) + 1)) / 2',
+            bigO: 'x',
+            real: 'x-1',
           },
         },
       },
       quick: {
         space: {
-          worst: { bigO: 'Math.log(x)', real: 'x/2' },
-          average: { bigO: 'Math.log(x)', real: 'x/2' },
-          best: { bigO: 'Math.log(x)', real: 'x/2' },
+          worst: { bigO: 'Math.log2(x)', real: 'x/2' },
+          average: { bigO: 'Math.log2(x)', real: 'x/2' },
+          best: { bigO: 'Math.log2(x)', real: 'x/2' },
         },
         time: {
           worst: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
-          average: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
-          best: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
+          average: { bigO: 'x * Math.log2(x)', real: 'x * Math.log2(x)' },
+          best: { bigO: 'x * Math.log2(x)', real: 'x * Math.log2(x + 1)' },
         },
       },
       merge: {
         space: {
-          worst: { bigO: 'x', real: 'x + Math.log(x)' },
-          average: { bigO: 'x', real: 'x + Math.log(x)' },
-          best: { bigO: 'x', real: 'x + Math.log(x)' },
+          worst: { bigO: 'x', real: 'x + Math.log2(x)' },
+          average: { bigO: 'x', real: 'x + Math.log2(x)' },
+          best: { bigO: 'x', real: 'x + Math.log2(x)' },
         },
         time: {
-          worst: { bigO: 'x*Math.log(x)', real: 'x*Math.log(x)' },
-          average: { bigO: 'x*Math.log(x)', real: 'x*Math.log(x)' },
-          best: { bigO: 'x*Math.log(x)', real: 'x*Math.log(x)' },
+          worst: { bigO: 'x*Math.log2(x)', real: 'x*Math.log2(x)' },
+          average: { bigO: 'x*Math.log2(x)', real: 'x*Math.log2(x)' },
+          best: { bigO: 'x*Math.log2(x)', real: 'x*Math.log2(x)' },
         },
       },
     },
@@ -144,8 +142,8 @@ export default function Charts() {
         },
         time: {
           worst: { bigO: 'x', real: 'x' },
-          average: { bigO: 'x', real: 'x' },
-          best: { bigO: 'x', real: 'x' },
+          average: { bigO: 'x', real: 'x/2' },
+          best: { bigO: '1', real: '1' },
         },
       },
       binary: {
@@ -155,9 +153,9 @@ export default function Charts() {
           best: { bigO: '1', real: '1' },
         },
         time: {
-          worst: { bigO: 'Math.log(x)', real: 'Math.log(x)' },
-          average: { bigO: 'Math.log(x)', real: 'Math.log(x)' },
-          best: { bigO: 'Math.log(x)', real: 'Math.log(x)' },
+          worst: { bigO: 'Math.log2(x)', real: 'Math.log2(x)' },
+          average: { bigO: 'Math.log2(x)', real: 'x * Math.log2(x) / (x+1)' },
+          best: { bigO: '1', real: '1' },
         },
       },
       interpolation: {
@@ -168,20 +166,20 @@ export default function Charts() {
         },
         time: {
           worst: { bigO: 'x', real: 'x' },
-          average: { bigO: 'x', real: 'x' },
-          best: { bigO: 'x', real: 'x' },
+          average: { bigO: 'Math.log2(Math.log2(x))', real: ' 2.42*Math.log2(Math.log2(x))' },
+          best: { bigO: '1', real: '1' },
         },
       },
       quickSelect: {
         space: {
-          worst: { bigO: 'Math.log(x)', real: 'x/2' },
-          average: { bigO: 'Math.log(x)', real: 'x/2' },
-          best: { bigO: 'Math.log(x)', real: 'x/2' },
+          worst: { bigO: 'Math.log2(x)', real: 'x/2' },
+          average: { bigO: 'Math.log2(x)', real: 'x/2' },
+          best: { bigO: 'Math.log2(x)', real: 'x/2' },
         },
         time: {
-          worst: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
-          average: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
-          best: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
+          worst: { bigO: 'Math.pow(x, 2)', real: 'x*(x + 1)/2' },
+          average: { bigO: 'x', real: 'Math.log(2) * x' },
+          best: { bigO: 'x', real: 'x' },
         },
       },
     },
@@ -208,9 +206,15 @@ export default function Charts() {
       const equationStringList: string[] = [];
       Object.keys(notationComplexityTypes).forEach(
         (notationComplexityType: 'space' | 'time') => {
+          if (state.chartLabelsFilter[notationComplexityType] === false) {
+            return;
+          }
           chartXAxisSteps[notationComplexityType] = {};
           Object.keys(notationComplexityTypes[notationComplexityType]).forEach(
             (notationScenario) => {
+              if (state.chartLabelsFilter[notationScenario] === false) {
+                return;
+              }
               const finalNotations =
                 notationComplexityTypes[notationComplexityType][
                   notationScenario
@@ -218,6 +222,9 @@ export default function Charts() {
               chartXAxisSteps[notationComplexityType][notationScenario] = {};
               Object.keys(finalNotations).forEach(
                 (realOrBigO: 'real' | 'bigO') => {
+                  if (state.chartLabelsFilter[realOrBigO] === false) {
+                    return;
+                  }
                   const equationString =
                     notationComplexityTypes[notationComplexityType][
                       notationScenario
@@ -259,38 +266,43 @@ export default function Charts() {
   };
 
   const filterLabels = (e) => {
-    const show = e.target.checked;//checked means show
+    const show = e.target.checked; //checked means show
     const name = e.target.name;
-    stateActions.changeLabelsFilter({name, show})
+    stateActions.changeLabelsFilter({ name, show });
   };
 
   const drawLabelsCheckboxes = () => {
-    const arbitraryAlgoType = Object.keys(equations[state.currentTab])[0];
-    const complexities = equations[state.currentTab][arbitraryAlgoType];
-    return Object.keys(complexities).map((complexityType: 'space' | 'time') => {
-      let checkboxesList = [];
-      // console.log(complexities);
-      // console.log(complexityType);
-      // console.log(complexities[complexityType]);
-      const scenarios = complexities[complexityType];
-      Object.keys(scenarios).forEach((scenario) => {
-        const realOrBigO = Object.keys(scenarios[scenario]);
-        realOrBigO.forEach((realOrBigO: 'real' | 'bigO') => {
-          checkboxesList.push(
-            <label className={`p-5`}>
-              {`${complexityType}-${scenario}-${realOrBigO}`}&nbsp;
-              <input
-                type='checkbox'
-                key={`${complexityType}-${scenario}-${realOrBigO}`}
-                name={`${complexityType}-${scenario}-${realOrBigO}`}
-                onChange={filterLabels}
-              />
-            </label>
-          );
-        });
-      });
-      return checkboxesList;
-    });
+    const checkboxesKeys = [
+      ['space', 'time'],
+      ['best', 'average', 'worst'],
+      ['real', 'bigO'],
+    ];
+    return checkboxesKeys
+      .map((keysSubList) => {
+        return (
+          <div aria-label={`${keysSubList.join('/')}`}>
+            {keysSubList.map((keyString: string) => {
+              let checked = true;
+              if (state.chartLabelsFilter[keyString] === false) {
+                checked = false;
+              }
+              return (
+                <label className={``}>
+                  {keyString}&nbsp;
+                  <input
+                    type='checkbox'
+                    key={keyString}
+                    name={keyString}
+                    checked={checked}
+                    onChange={filterLabels}
+                  />
+                </label>
+              );
+            })}
+          </div>
+        );
+      })
+      .flat();
   };
 
   return (
