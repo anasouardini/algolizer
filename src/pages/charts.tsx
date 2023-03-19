@@ -166,7 +166,10 @@ export default function Charts() {
         },
         time: {
           worst: { bigO: 'x', real: 'x' },
-          average: { bigO: 'Math.log2(Math.log2(x))', real: ' 2.42*Math.log2(Math.log2(x))' },
+          average: {
+            bigO: 'Math.log2(Math.log2(x))',
+            real: ' 2.42*Math.log2(Math.log2(x))',
+          },
           best: { bigO: '1', real: '1' },
         },
       },
@@ -272,22 +275,24 @@ export default function Charts() {
   };
 
   const drawLabelsCheckboxes = () => {
-    const checkboxesKeys = [
-      ['space', 'time'],
-      ['best', 'average', 'worst'],
-      ['real', 'bigO'],
-    ];
-    return checkboxesKeys
+    const checkboxesKeys = {
+    Complexity: ['space', 'time'],
+      Scenario: ['best', 'average', 'worst'],
+      Accuracy: ['real', 'bigO']
+    };
+    return Object.keys(checkboxesKeys)
       .map((keysSubList) => {
+        const checkboxGroupKey = checkboxesKeys[keysSubList].join('/');
         return (
-          <div aria-label={`${keysSubList.join('/')}`}>
-            {keysSubList.map((keyString: string) => {
+          <div aria-label={checkboxGroupKey} key={checkboxGroupKey} className={`flex gap-4`}>
+            {`${keysSubList}: `}&nbsp;
+            {checkboxesKeys[keysSubList].map((keyString: string) => {
               let checked = true;
               if (state.chartLabelsFilter[keyString] === false) {
                 checked = false;
               }
               return (
-                <label className={``}>
+                <label key={keyString} className={`text-gray-600`}>
                   {keyString}&nbsp;
                   <input
                     type='checkbox'
@@ -313,34 +318,36 @@ export default function Charts() {
         getting diminished
       </p>
       {/* don't miss with controls paddings, css is finicky. */}
-      <div aria-label='controls' className={`my-6 flex align-center gap-5`}>
-        <label className={`py-1`}>
-          <select
-            onChange={(e) => {
-              stateActions.changeTab(e.target.value);
-            }}
-            className={`border-2 border-blue-400 rounded py-1`}
-          >
-            <option>sorting</option>
-            <option>searching</option>
-          </select>
-        </label>
-        <label className={`flex text-center py-2`}>
-          X-Axis:&nbsp;
-          <input
-            type='range'
-            min={0}
-            max={100}
-            onChange={(e) => {
-              stateActions.changeTime(parseInt(e.target.value));
-            }}
-            className={`accent-blue-500`}
-          />
-        </label>
-        <div aria-label={`labels`}>
-          <label>{drawLabelsCheckboxes()}</label>
+      <section aria-label='controls' className={`my-6 flex flex-col align-center gap-5`}>
+        <div className={`my-6 flex align-center gap-5`}>
+          <label className={`py-1`}>
+            <select
+              onChange={(e) => {
+                stateActions.changeTab(e.target.value);
+              }}
+              className={`border-2 border-blue-400 rounded py-1`}
+            >
+              <option>sorting</option>
+              <option>searching</option>
+            </select>
+          </label>
+          <label className={`flex text-center py-2`}>
+            X-Axis:&nbsp;
+            <input
+              type='range'
+              min={0}
+              max={100}
+              onChange={(e) => {
+                stateActions.changeTime(parseInt(e.target.value));
+              }}
+              className={`accent-blue-500`}
+            />
+          </label>
         </div>
-      </div>
+        <div aria-label={`notations filter`} className={``}>
+          {drawLabelsCheckboxes()}
+        </div>
+      </section>
       <div
         key={state.currentTab}
         aria-label={`algo-${state.currentTab}`}

@@ -62,10 +62,11 @@ export default function AlgoAnimation(props: propsT) {
     // });
   });
 
+  // TODO: clean up algorithms and their steps. e.g concat is not used anymore.
+
   const stepsActions: stepsActionsT = {
     compare: {
       do: (step) => {
-        //TODO: indicate comparing index with a value
 
         if (step.elements[0].type == 'index') {
           const firstIndex = step.elements[0].value;
@@ -157,7 +158,6 @@ export default function AlgoAnimation(props: propsT) {
     },
     calc: {
       do: (step) => {
-        // TODO: show some calculating animation
       },
       undo: (step) => {},
     },
@@ -249,7 +249,6 @@ export default function AlgoAnimation(props: propsT) {
       return;
     }
     // console.log(barsRefs)
-    // TODO: animate the value comparision
     // TODO: make sure timing is realistic
 
     const currentStep = props.stepsLog[props.queue.currentStep];
