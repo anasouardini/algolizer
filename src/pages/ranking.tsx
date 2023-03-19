@@ -204,48 +204,49 @@ export default function Ranking() {
     // reset
     stateRefActions.reset();
 
-    return genData[state.currentTab].reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
-      stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
+    return genData[state.currentTab].reduce(
+      (acc: { [key: string]: JSX.Element[] }, datum) => {
+        stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
 
-      const barsList = datum();
+        const barsList = datum();
 
-      let randTarget = -1;
-      if (state.currentTab == 'searching') {
-        randTarget = barsList[Tools.randInt(0, datum.length - 1)];
-      }
-
-      acc[datum.name] = algorithms[state.currentTab].map((algo) => {
-        stateRef.current.cellsRankCounters.algo2datum[algo.name] = 1;
-        const stepsLog: stepsLogT = [];
-        const cellCbQueueKey = datum.name + '' + algo.name;
-        stateRef.current.cellsStepCbList[cellCbQueueKey] = {
-          info: { datumName: datum.name, algoName: algo.name },
-        };
-
-        let output;
-        if (state.currentTab == 'sorting') {
-
-          // const start = Date.now();
-          output = algo(barsList, stepsLog);
-          // const end = Date.now();
-          // const duration = end - start;
-          // console.log(algo.name, datum.name, start, end, duration)
-
-        } else {
-          // console.log(randTarget)
-          output = algo(barsList, randTarget, stepsLog);
+        let randTarget = -1;
+        if (state.currentTab == 'searching') {
+          randTarget = barsList[Tools.randInt(0, datum.length - 1)];
         }
 
-        stateRef.current.lastRunData[cellCbQueueKey] = {
-          barsList,
-          stepsLog,
-        };
+        acc[datum.name] = algorithms[state.currentTab].map((algo) => {
+          stateRef.current.cellsRankCounters.algo2datum[algo.name] = 1;
+          const stepsLog: stepsLogT = [];
+          const cellCbQueueKey = datum.name + '' + algo.name;
+          stateRef.current.cellsStepCbList[cellCbQueueKey] = {
+            info: { datumName: datum.name, algoName: algo.name },
+          };
 
-        return drawCell(cellCbQueueKey);
-      });
+          let output;
+          if (state.currentTab == 'sorting') {
+            // const start = Date.now();
+            output = algo(barsList, stepsLog);
+            // const end = Date.now();
+            // const duration = end - start;
+            // console.log(algo.name, datum.name, start, end, duration)
+          } else {
+            // console.log(randTarget)
+            output = algo(barsList, randTarget, stepsLog);
+          }
 
-      return acc;
-    }, {});
+          stateRef.current.lastRunData[cellCbQueueKey] = {
+            barsList,
+            stepsLog,
+          };
+
+          return drawCell(cellCbQueueKey);
+        });
+
+        return acc;
+      },
+      {}
+    );
   };
 
   const resetCells = () => {
@@ -253,86 +254,91 @@ export default function Ranking() {
     stateRefActions.reset();
 
     // resetCells
-    return genData[state.currentTab].reduce((acc: { [key: string]: JSX.Element[] }, datum) => {
-      stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
+    return genData[state.currentTab].reduce(
+      (acc: { [key: string]: JSX.Element[] }, datum) => {
+        stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
 
-      acc[datum.name] = algorithms[state.currentTab].map((algo) => {
-        stateRef.current.cellsRankCounters.algo2datum[algo.name] = 1;
-        const cellCbQueueKey = datum.name + '' + algo.name;
+        acc[datum.name] = algorithms[state.currentTab].map((algo) => {
+          stateRef.current.cellsRankCounters.algo2datum[algo.name] = 1;
+          const cellCbQueueKey = datum.name + '' + algo.name;
 
-        return drawCell(cellCbQueueKey);
-      });
-      return acc;
-    }, {});
+          return drawCell(cellCbQueueKey);
+        });
+        return acc;
+      },
+      {}
+    );
   };
 
   let tableCells = state.genNew ? genCells() : resetCells();
   // console.log(tableCells)
 
   return (
-    <main className={`p-5 flex flex-col items-center`}>
-      <div aria-label='controls' className={`flex justify-center mb-8 gap-3`}>
-        {/* icons would be better than text in buttons */}
-        <button
-          onClick={oneStep}
-          className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
-        >
-          step
-        </button>
-        <button
-          ref={(el) => {
-            stateRef.current.buttons['play'] = el;
-          }}
-          onClick={runSteps}
-          className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
-        >
-          play All
-        </button>
-        <button
-          onClick={stateActions.oldCells}
-          className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
-        >
-          Reset
-        </button>
-        <button
-          onClick={stateActions.newCells}
-          className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
-        >
-          New Data
-        </button>
-        <select
-          value={state.currentTab}
-          onChange={(e) => {
-            stateRefActions.clearDataCache();
-            stateRefActions.reset();
-            stateActions.switchtab(e.target.value);
-          }}
-          className={`border-green-600 border-2 rounded-md px-3 py-1 capitalize`}
-        >
-          <option>sorting</option>
-          <option>searching</option>
-        </select>
-      </div>
-      <table className={`text-gray-500`}>
-        <thead>
-          <tr>
-            <th></th>
-            {algorithms[state.currentTab].map((algo) => {
-              return <th key={`${algo.name}`}>{algo.name}</th>;
+    <main className={`flex flex-col items-center`}>
+      <div aria-label='wrapper' className={`mt-5`}>
+        <section aria-label='controls' className={`flex mb-8 gap-3`}>
+          {/* icons would be better than text in buttons */}
+          <button
+            onClick={oneStep}
+            className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
+          >
+            step
+          </button>
+          <button
+            ref={(el) => {
+              stateRef.current.buttons['play'] = el;
+            }}
+            onClick={runSteps}
+            className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
+          >
+            play All
+          </button>
+          <button
+            onClick={stateActions.oldCells}
+            className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
+          >
+            Reset
+          </button>
+          <button
+            onClick={stateActions.newCells}
+            className={`border-blue-400 border-2 rounded-md px-3 py-1 capitalize`}
+          >
+            New Data
+          </button>
+          <select
+            value={state.currentTab}
+            onChange={(e) => {
+              stateRefActions.clearDataCache();
+              stateRefActions.reset();
+              stateActions.switchtab(e.target.value);
+            }}
+            className={`ml-auto border-green-600 border-2 rounded-md px-3 py-1 capitalize`}
+          >
+            <option>sorting</option>
+            <option>searching</option>
+          </select>
+        </section>
+        <table className={`text-gray-500`}>
+          <thead>
+            <tr>
+              <th></th>
+              {algorithms[state.currentTab].map((algo) => {
+                return <th key={`${algo.name}`}>{algo.name}</th>;
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(tableCells).map((ItemKey) => {
+              return (
+                <tr key={`${ItemKey}`} className={``}>
+                  <th className={`text-left`}>{ItemKey}</th>
+                  {tableCells[ItemKey]}
+                </tr>
+              );
             })}
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(tableCells).map((ItemKey) => {
-            return (
-              <tr key={`${ItemKey}`} className={``}>
-                <th className={`text-left`}>{ItemKey}</th>
-                {tableCells[ItemKey]}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </main>
   );
 }

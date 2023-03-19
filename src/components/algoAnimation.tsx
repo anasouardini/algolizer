@@ -40,7 +40,7 @@ export default function AlgoAnimation(props: propsT) {
     calc: ['#bada55', '#bada55'],
     push: ['green'],
     split: ['#fa8a15', '#4a5a95'],
-    concat: ['#bada55', '#4a5a95'],
+    append: ['#bada55', '#4a5a95'],
     found: ['#8aba95', '#8aba95'],
   };
 
@@ -163,7 +163,12 @@ export default function AlgoAnimation(props: propsT) {
     },
     push: {
       do: (step) => {
-        // TODO: find a way to visualize both of lists and push to the second list
+        const pushValue = step.element.value;
+        const pushIndex = step.element.index;
+        const targetIndex = step.target.index;
+
+        barsRefs[targetIndex].style.height = pushValue+'px';
+        // console.log(barsRefs[targetIndex], pushValue)
       },
       undo: (step) => {},
     },
@@ -190,27 +195,25 @@ export default function AlgoAnimation(props: propsT) {
         }
       },
     },
-    concat: {
+    append: {
       do: (step) => {
-        for (let i = 0; i < step.chunks.length; i++) {
-          const start = step.chunks[i].start;
-          const end = step.chunks[i].end;
-
-          // coloring both concatenated chunks
-          for (let k = start; k <= end; k++) {
-            barsRefs[k].style.background = stepsActionsColor[step.type][i];
-          }
+        step.target.forEach((value, index)=>{
+          console.log(barsRefs[step.source + index])
+          barsRefs[step.source + index].style.height = value+'px';
+        })
+      },
+      undo: (step) => {
+      },
+    },
+    highlight: {
+      do: (step) => {
+        for(let i=step.start; i<=step.end; i++){
+          barsRefs[i].style.background = '#bada55';
         }
       },
       undo: (step) => {
-        for (let i = 0; i < step.chunks.length; i++) {
-          const start = step.chunks[i].start;
-          const end = step.chunks[i].end;
-
-          // coloring both concatenated chunks
-          for (let k = start; k <= end; k++) {
-            barsRefs[k].style.background = stepsActionsColor['idle'][0];
-          }
+        for(let i=step.start; i<=step.end; i++){
+          barsRefs[i].style.background = stepsActionsColor.idle[0];
         }
       },
     },
@@ -252,7 +255,7 @@ export default function AlgoAnimation(props: propsT) {
     // TODO: make sure timing is realistic
 
     const currentStep = props.stepsLog[props.queue.currentStep];
-    // console.log(currentStep);
+    console.log(currentStep);
     stepsActions[currentStep.type].do(currentStep);
     setTimeout(() => {
       let end = props.queue.length === props.queue.currentStep;
