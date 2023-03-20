@@ -1,36 +1,59 @@
-import {stepsLogT} from '../types';
+import { stepsLogT } from '../types';
 
-const interpolation = (list: number[], target: number, stepsLog:stepsLogT) => {
-  let tmpList = [...list];
-  while (tmpList.length) {
-    const length = tmpList.length;
-    // low + (high - low) * (targetValue - array[low]) / (array[high] -  array[low]);
-    const part1 = 0 + (length-1 - 0);
-    const part2 = (target - tmpList[0]);
-    const part3 = (tmpList[length-1] -  tmpList[0]);
-    const probe = Math.floor(part1 * part2 / part3);
-    stepsLog.push({type: 'calc', value: probe});
+const interpolation = (list: number[], target: number, stepsLog: stepsLogT) => {
+  const interpolation = (
+    list: number[],
+    start: number,
+    end: number,
+    target: number,
+    stepsLog: stepsLogT
+  ) => {
+    while (end-start > 0) {
+      // mid = Lo + ((Hi - Lo) / (A[Hi] - A[Lo])) * (X - A[Lo])
+      const part1 = ((target - list[start]) * (end - start));
+      const part2 = (list[end] - list[start]);
+      const probe = Math.floor(start + (part1 / part2));
+      stepsLog.push({ type: 'calc', value: probe });
 
-    stepsLog.push({type: 'compare', elements: [{type: 'value', value: target}, {type: 'index', value: probe}]});
-    if (target == tmpList[probe]) {
-      stepsLog.push({type: 'found', element: {type: 'index', value: probe}});
-      return true;
+      stepsLog.push({
+        type: 'compare',
+        elements: [
+          { type: 'value', value: target },
+          { type: 'index', value: probe },
+        ],
+      });
+      if (target == list[probe]) {
+        stepsLog.push({
+          type: 'found',
+          element: { type: 'index', value: probe },
+        });
+        return true;
+      }
+
+      stepsLog.push({
+        type: 'compare',
+        elements: [
+          { type: 'value', value: target },
+          { type: 'index', value: probe },
+        ],
+      });
+      if (target < list[probe]) {
+        stepsLog.push({ type: 'reduce', range: { start: 0, end: probe } });
+        end = probe;
+        continue;
+      }
+
+      stepsLog.push({
+        type: 'reduce',
+        range: { start: probe + 1, end},
+      });
+      start = probe+1;
     }
 
-    stepsLog.push({type: 'compare', elements: [{type: 'value', value: target}, {type: 'index', value: probe}]});
-    if (target < tmpList[probe]) {
-    stepsLog.push({type: 'reduce', range: {start: 0, end: probe-1}});
-      tmpList = tmpList.slice(0, probe);
-      continue;
-    }
-
-    stepsLog.push({type: 'reduce', range: {start: probe+1, end: length-1}});
-    tmpList = tmpList.slice(probe + 1);
-    continue;
-  }
-
-  stepsLog.push({type: 'notFound'});
-  return false;
+    stepsLog.push({ type: 'notFound' });
+    return false;
+  };
+  interpolation(list, 0, list.length-1, target, stepsLog);
 };
 
 export default interpolation;

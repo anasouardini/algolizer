@@ -67,7 +67,6 @@ export default function AlgoAnimation(props: propsT) {
   const stepsActions: stepsActionsT = {
     compare: {
       do: (step) => {
-
         if (step.elements[0].type == 'index') {
           const firstIndex = step.elements[0].value;
           barsRefs[firstIndex].style.background =
@@ -157,8 +156,7 @@ export default function AlgoAnimation(props: propsT) {
       },
     },
     calc: {
-      do: (step) => {
-      },
+      do: (step) => {},
       undo: (step) => {},
     },
     push: {
@@ -167,7 +165,7 @@ export default function AlgoAnimation(props: propsT) {
         const pushIndex = step.element.index;
         const targetIndex = step.target.index;
 
-        barsRefs[targetIndex].style.height = pushValue+'px';
+        barsRefs[targetIndex].style.height = pushValue + 'px';
         // console.log(barsRefs[targetIndex], pushValue)
       },
       undo: (step) => {},
@@ -197,22 +195,21 @@ export default function AlgoAnimation(props: propsT) {
     },
     append: {
       do: (step) => {
-        step.target.forEach((value, index)=>{
-          console.log(barsRefs[step.source + index])
-          barsRefs[step.source + index].style.height = value+'px';
-        })
+        step.target.forEach((value, index) => {
+          // console.log(barsRefs[step.source + index])
+          barsRefs[step.source + index].style.height = value + 'px';
+        });
       },
-      undo: (step) => {
-      },
+      undo: (step) => {},
     },
     highlight: {
       do: (step) => {
-        for(let i=step.start; i<=step.end; i++){
+        for (let i = step.start; i <= step.end; i++) {
           barsRefs[i].style.background = '#bada55';
         }
       },
       undo: (step) => {
-        for(let i=step.start; i<=step.end; i++){
+        for (let i = step.start; i <= step.end; i++) {
           barsRefs[i].style.background = stepsActionsColor.idle[0];
         }
       },
@@ -220,17 +217,16 @@ export default function AlgoAnimation(props: propsT) {
     found: {
       do: (step) => {
         // console.log(props.queue.info.algoName, props.queue.info.datumName, step.element.value)
-        barsRefs[step.element.value].style.background = stepsActionsColor[step.type][0];
+        barsRefs[step.element.value].style.background =
+          stepsActionsColor[step.type][0];
       },
       undo: (step) => {
         // barsRefs[step.element.value].style.background = stepsActionsColor['idle'][0];
       },
     },
     notFound: {
-      do: (step) => {
-      },
-      undo: (step) => {
-      },
+      do: (step) => {},
+      undo: (step) => {},
     },
   };
 
@@ -255,7 +251,7 @@ export default function AlgoAnimation(props: propsT) {
     // TODO: make sure timing is realistic
 
     const currentStep = props.stepsLog[props.queue.currentStep];
-    console.log(currentStep);
+    // console.log(currentStep);
     stepsActions[currentStep.type].do(currentStep);
     setTimeout(() => {
       let end = props.queue.length === props.queue.currentStep;

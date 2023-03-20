@@ -115,7 +115,7 @@ export default function Charts() {
           best: { bigO: 'Math.log2(x)', real: 'x/2' },
         },
         time: {
-          worst: { bigO: 'Math.pow(x, 2)', real: '(x * (x + 1)) / 2' },
+          worst: { bigO: 'x* Math.log2(x)', real: 'x* Math.log2(x)' },
           average: { bigO: 'x * Math.log2(x)', real: 'x * Math.log2(x)' },
           best: { bigO: 'x * Math.log2(x)', real: 'x * Math.log2(x + 1)' },
         },

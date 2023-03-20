@@ -150,7 +150,7 @@ export default function Ranking() {
     Object.values(stateRef.current.cellsStepCbList).forEach((cell) => {
       const stepper = async () => {
         if (cell.running === false) {
-          console.log('stopping...');
+          // console.log('stopping...');
           stateRef.current.buttons.play.innerText = 'Play All';
           return;
         }
@@ -209,10 +209,13 @@ export default function Ranking() {
         stateRef.current.cellsRankCounters.datum2algo[datum.name] = 1;
 
         const barsList = datum();
+        // console.log(barsList)
 
         let randTarget = -1;
         if (state.currentTab == 'searching') {
-          randTarget = barsList[Tools.randInt(0, datum.length - 1)];
+          randTarget = barsList[1];
+          // console.log(barsList[Tools.randInt(0, barsList.length - 1)])
+          console.log(randTarget)
         }
 
         acc[datum.name] = algorithms[state.currentTab].map((algo) => {
@@ -230,8 +233,9 @@ export default function Ranking() {
             // const end = Date.now();
             // const duration = end - start;
             // console.log(algo.name, datum.name, start, end, duration)
+            // console.log(algo.name, datum.name)
           } else {
-            // console.log(randTarget)
+            console.log(algo.name, datum.name)
             output = algo(barsList, randTarget, stepsLog);
           }
 
@@ -239,7 +243,6 @@ export default function Ranking() {
             barsList,
             stepsLog,
           };
-
           return drawCell(cellCbQueueKey);
         });
 
