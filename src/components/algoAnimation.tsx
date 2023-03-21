@@ -42,6 +42,7 @@ export default function AlgoAnimation(props: propsT) {
     split: ['#fa8a15', '#4a5a95'],
     append: ['#bada55', '#4a5a95'],
     found: ['#8aba95', '#8aba95'],
+    highlight: ['#bada55'],
   };
 
   type stepsActionsT = {
@@ -64,29 +65,46 @@ export default function AlgoAnimation(props: propsT) {
 
   // TODO: clean up algorithms and their steps. e.g concat is not used anymore.
 
+  const changeBackground = (
+    barIndex: number,
+    stepType: string,
+    colorIndex: number
+  ) => {
+    if (!barsRefs[barIndex]) {
+      if (props.queue.info.algoName === 'interpolation') {
+        // interpolation probe is giving indexes outside the scope of the list
+        // so I just ignore it.
+        return;
+      }
+      console.log(props.queue.info, stepType);
+      return;
+    }
+    barsRefs[barIndex].style.background =
+      stepsActionsColor[stepType][colorIndex];
+  };
+
   const stepsActions: stepsActionsT = {
     compare: {
       do: (step) => {
         if (step.elements[0].type == 'index') {
           const firstIndex = step.elements[0].value;
-          barsRefs[firstIndex].style.background =
-            stepsActionsColor[step.type][0];
+
+          changeBackground(firstIndex, step.type, 0);
         }
 
         if (step.elements[1].type == 'index') {
           const secondIndex = step.elements[1].value;
-          barsRefs[secondIndex].style.background =
-            stepsActionsColor[step.type][0];
+          changeBackground(secondIndex, step.type, 0);
         }
       },
       undo: (step) => {
         if (step.elements[0].type == 'index') {
           const firstIndex = step.elements[0].value;
-          barsRefs[firstIndex].style.background = stepsActionsColor['idle'][0];
+          changeBackground(firstIndex, 'idle', 0);
         }
         if (step.elements[1].type == 'index') {
           const secondIndex = step.elements[1].value;
-          barsRefs[secondIndex].style.background = stepsActionsColor['idle'][0];
+          changeBackground(secondIndex, 'idle', 0);
         }
       },
     },
@@ -94,9 +112,8 @@ export default function AlgoAnimation(props: propsT) {
       do: (step) => {
         const firstIndex = step.elements[0].value;
         const secondIndex = step.elements[1].value;
-        barsRefs[firstIndex].style.background = stepsActionsColor[step.type][0];
-        barsRefs[secondIndex].style.background =
-          stepsActionsColor[step.type][0];
+        changeBackground(firstIndex, step.type, 0);
+        changeBackground(secondIndex, step.type, 0);
 
         // swaping heights instead of elements
         const firstElmHeight = barsRefs[firstIndex].style.height;
@@ -106,8 +123,8 @@ export default function AlgoAnimation(props: propsT) {
       undo: (step) => {
         const firstIndex = step.elements[0].value;
         const secondIndex = step.elements[1].value;
-        barsRefs[firstIndex].style.background = stepsActionsColor.idle[0];
-        barsRefs[secondIndex].style.background = stepsActionsColor.idle[0];
+        changeBackground(firstIndex, 'idle', 0);
+        changeBackground(secondIndex, 'idle', 0);
       },
     },
     replace: {
@@ -115,14 +132,12 @@ export default function AlgoAnimation(props: propsT) {
         const indexToReplace = step.elements[0].value;
         const valueToReplaceWith = step.elements[1].value;
 
-        barsRefs[indexToReplace].style.background =
-          stepsActionsColor[step.type][0];
+        changeBackground(indexToReplace, step.type, 0);
         barsRefs[indexToReplace].style.height = `${valueToReplaceWith}px`;
       },
       undo: (step) => {
         const indexToReplace = step.elements[0].value;
-        barsRefs[indexToReplace].style.background =
-          stepsActionsColor['idle'][0];
+        changeBackground(indexToReplace, 'idle', 0);
       },
     },
     reduce: {
@@ -130,7 +145,7 @@ export default function AlgoAnimation(props: propsT) {
         const start = step.range.start;
         const end = step.range.end;
         for (let i = start; i <= end; i++) {
-          barsRefs[i].style.background = stepsActionsColor[step.type][0];
+          changeBackground(i, step.type, 0);
         }
       },
       undo: (step) => {},
@@ -142,8 +157,8 @@ export default function AlgoAnimation(props: propsT) {
 
         // shifting an item and shade(kind of hiding) it's first position
         // barsRefs[to] = barsRefs[from];
-        barsRefs[from].style.background = stepsActionsColor[step.type][0];
-        barsRefs[to].style.background = stepsActionsColor[step.type][1];
+        changeBackground(from, step.type, 0);
+        changeBackground(to, step.type, 1);
 
         // shifting
         barsRefs[to].style.height = barsRefs[from].style.height;
@@ -151,8 +166,8 @@ export default function AlgoAnimation(props: propsT) {
       undo: (step) => {
         const from = step.elements.from;
         const to = step.elements.to;
-        barsRefs[from].style.background = stepsActionsColor['idle'][0];
-        barsRefs[to].style.background = stepsActionsColor['idle'][0];
+        changeBackground(from, 'idle', 0);
+        changeBackground(to, 'idle', 0);
       },
     },
     calc: {
@@ -178,7 +193,7 @@ export default function AlgoAnimation(props: propsT) {
           const start = step.chunks[i].start;
           const end = step.chunks[i].end;
           for (let k = start; k <= end; k++) {
-            barsRefs[k].style.background = stepsActionsColor[step.type][i];
+            changeBackground(k, step.type, i);
           }
         }
       },
@@ -188,7 +203,7 @@ export default function AlgoAnimation(props: propsT) {
           const start = step.chunks[i].start;
           const end = step.chunks[i].end;
           for (let k = start; k <= end; k++) {
-            barsRefs[k].style.background = stepsActionsColor['idle'][0];
+            changeBackground(k, 'idle', 0);
           }
         }
       },
@@ -205,20 +220,19 @@ export default function AlgoAnimation(props: propsT) {
     highlight: {
       do: (step) => {
         for (let i = step.start; i <= step.end; i++) {
-          barsRefs[i].style.background = '#bada55';
+          changeBackground(i, step.type, 0);
         }
       },
       undo: (step) => {
         for (let i = step.start; i <= step.end; i++) {
-          barsRefs[i].style.background = stepsActionsColor.idle[0];
+          changeBackground(i, 'idle', 0);
         }
       },
     },
     found: {
       do: (step) => {
         // console.log(props.queue.info.algoName, props.queue.info.datumName, step.element.value)
-        barsRefs[step.element.value].style.background =
-          stepsActionsColor[step.type][0];
+        changeBackground(step.element.value, step.type, 0);
       },
       undo: (step) => {
         // barsRefs[step.element.value].style.background = stepsActionsColor['idle'][0];
@@ -252,7 +266,16 @@ export default function AlgoAnimation(props: propsT) {
 
     const currentStep = props.stepsLog[props.queue.currentStep];
     // console.log(currentStep);
-    stepsActions[currentStep.type].do(currentStep);
+    // console.log(props.queue.info.algoName, props.queue.info.datumName, currentStep);
+    try {
+      stepsActions[currentStep.type].do(currentStep);
+    } catch (e) {
+      console.log(
+        props.queue.info.algoName,
+        props.queue.info.datumName,
+        currentStep
+      );
+    }
     setTimeout(() => {
       let end = props.queue.length === props.queue.currentStep;
       if (end) {
@@ -363,7 +386,9 @@ export default function AlgoAnimation(props: propsT) {
             key={index}
             ref={(el) => barsRefs.push(el)}
             style={{
-              background: stepsActionsColor.idle[0],
+              background: props.stepsLog.length
+                ? stepsActionsColor.idle[0]
+                : '#999',
               height: `${bar}px`,
             }}
             className={`w-[7px]`}
