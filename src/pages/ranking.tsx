@@ -82,6 +82,15 @@ export default function Ranking() {
       if (stateRef.current.buttons.play) {
         stateRef.current.buttons.play.innerText = 'Play All';
       }
+
+      //reset rank counters
+      stateRef.current.cellsRankCounters.time = 1;
+      Object.keys(stateRef.current.cellsRankCounters.algo2datum).forEach((key)=>{
+        stateRef.current.cellsRankCounters.algo2datum[key] = 1;
+      });
+      Object.keys(stateRef.current.cellsRankCounters.datum2algo).forEach((key)=>{
+        stateRef.current.cellsRankCounters.datum2algo[key] = 1;
+      });
     },
     clearDataCache: () => {
       stateRef.current.lastRunData = {};
@@ -130,7 +139,7 @@ export default function Ranking() {
   // my context switcher
   const runSteps = (e) => {
     // console.log(cbQueueRef)
-
+    // stateRefActions.reset();
     const buttonTexts: string[] = ['Play All', 'Pause All'];
 
     stateRef.current.stepperState.running =
@@ -213,9 +222,9 @@ export default function Ranking() {
 
         let randTarget = -1;
         if (state.currentTab == 'searching') {
-          randTarget = barsList[1];
+          randTarget = barsList.at(Tools.randInt(0, barsList.length - 1));
           // console.log(barsList[Tools.randInt(0, barsList.length - 1)])
-          console.log(randTarget)
+          // console.log(randTarget)
         }
 
         acc[datum.name] = algorithms[state.currentTab].map((algo) => {
@@ -229,14 +238,19 @@ export default function Ranking() {
           let output;
           if (state.currentTab == 'sorting') {
             // const start = Date.now();
+            // console.log(algo.name, datum.name)
             output = algo(barsList, stepsLog);
             // const end = Date.now();
             // const duration = end - start;
             // console.log(algo.name, datum.name, start, end, duration)
-            // console.log(algo.name, datum.name)
           } else {
-            console.log(algo.name, datum.name)
-            output = algo(barsList, randTarget, stepsLog);
+            // console.log(algo.name, datum.name)
+            // interpolation and binary searching algorithms get
+            // stuck in an infinite loop when given non-sorted data.
+            if(!((algo.name === 'interpolation' || algo.name === 'binary') && datum.name !== 'sorted')){
+              output = algo(barsList, randTarget, stepsLog);
+              // console.log(output)
+            }
           }
 
           stateRef.current.lastRunData[cellCbQueueKey] = {
