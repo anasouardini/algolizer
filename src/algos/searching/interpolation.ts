@@ -53,6 +53,7 @@ const interpolation = (list: number[], target: number, stepsLog: stepsLogT) => {
     stepsLog.push({ type: 'notFound' });
     return false;
   };
+
   interpolation(list, 0, list.length-1, target, stepsLog);
 };
 

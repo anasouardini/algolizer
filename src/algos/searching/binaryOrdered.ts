@@ -1,10 +1,8 @@
 import { stepsLogT } from '../types';
 
-// TODO: refactor this miss
-const binaryOrdered = (list: number[], target: number, stepsLog: stepsLogT) => {
-  let tmpList = [...list];
+const binary = (list: number[], target: number, stepsLog: stepsLogT) => {
   let start = 0;
-  let end = 0;
+  let end = list.length;
   while (start <= end) {
     const middleIndex = Math.floor(start + (end - start) / 2);
 
@@ -15,7 +13,7 @@ const binaryOrdered = (list: number[], target: number, stepsLog: stepsLogT) => {
         { type: 'index', value: middleIndex },
       ],
     });
-    if (target == tmpList[middleIndex]) {
+    if (target == list[middleIndex]) {
       // console.log(target, middleIndex)
       stepsLog.push({
         type: 'found',
@@ -31,12 +29,11 @@ const binaryOrdered = (list: number[], target: number, stepsLog: stepsLogT) => {
         { type: 'index', value: middleIndex },
       ],
     });
-    if (target < tmpList[middleIndex]) {
+    if (target < list[middleIndex]) {
       stepsLog.push({
         type: 'reduce',
         range: { start: 0, end: middleIndex - 1 },
       });
-      // tmpList = tmpList.slice(0, middleIndex);
       start = 0;
       end = middleIndex - 1;
       continue;
@@ -46,7 +43,6 @@ const binaryOrdered = (list: number[], target: number, stepsLog: stepsLogT) => {
       type: 'reduce',
       range: { start: middleIndex + 1, end: length - 1 },
     });
-    // tmpList = tmpList.slice(middleIndex + 1);
     start = middleIndex + 1;
   }
 
@@ -54,4 +50,4 @@ const binaryOrdered = (list: number[], target: number, stepsLog: stepsLogT) => {
   return false;
 };
 
-export default binaryOrdered;
+export default binary;
