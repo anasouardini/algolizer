@@ -18,7 +18,6 @@ const selection = (list: number[], stepsLog: stepsLogT) => {
       }
     }
 
-    // xoring same value with itself produces 0.
     stepsLog.push({
       type: 'swap',
       elements: [
@@ -27,9 +26,7 @@ const selection = (list: number[], stepsLog: stepsLogT) => {
       ],
     });
     if (minSelected != i) {
-      output[i] ^= output[minSelected];
-      output[minSelected] ^= output[i];
-      output[i] ^= output[minSelected];
+      [output[minSelected], output[i]] = [output[i], output[minSelected]];
     }
   }
 

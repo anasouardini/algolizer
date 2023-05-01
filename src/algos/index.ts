@@ -8,7 +8,6 @@ import binaryOrdered from './searching/binaryOrdered';
 import quickSelect from './searching/quickSelect';
 import interpolation from './searching/interpolation';
 
-// TODO: visualize memory consumption
 
 // TESTING
 // const algoTester = () => {

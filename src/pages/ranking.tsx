@@ -85,12 +85,16 @@ export default function Ranking() {
 
       //reset rank counters
       stateRef.current.cellsRankCounters.time = 1;
-      Object.keys(stateRef.current.cellsRankCounters.algo2datum).forEach((key)=>{
-        stateRef.current.cellsRankCounters.algo2datum[key] = 1;
-      });
-      Object.keys(stateRef.current.cellsRankCounters.datum2algo).forEach((key)=>{
-        stateRef.current.cellsRankCounters.datum2algo[key] = 1;
-      });
+      Object.keys(stateRef.current.cellsRankCounters.algo2datum).forEach(
+        (key) => {
+          stateRef.current.cellsRankCounters.algo2datum[key] = 1;
+        }
+      );
+      Object.keys(stateRef.current.cellsRankCounters.datum2algo).forEach(
+        (key) => {
+          stateRef.current.cellsRankCounters.datum2algo[key] = 1;
+        }
+      );
     },
     clearDataCache: () => {
       stateRef.current.lastRunData = {};
@@ -247,7 +251,12 @@ export default function Ranking() {
             // console.log(algo.name, datum.name)
             // interpolation and binary searching algorithms get
             // stuck in an infinite loop when given non-sorted data.
-            if(!((algo.name === 'interpolation' || algo.name === 'binary') && datum.name !== 'sorted')){
+            if (
+              !(
+                (algo.name === 'interpolation' || algo.name === 'binary') &&
+                datum.name !== 'sorted'
+              )
+            ) {
               output = algo(barsList, randTarget, stepsLog);
               // console.log(output)
             }
@@ -292,6 +301,14 @@ export default function Ranking() {
 
   return (
     <main className={`flex flex-col items-center`}>
+      <p className={`text-left text-gray-600`}>
+        <span className={`text-black mr-3`}>Rank: </span>
+        time rank
+        <span className={`text-red-300 text-2xl font-extrabold`}> / </span>
+        best algo for ds
+        <span className={`text-red-300 text-2xl font-extrabold`}> / </span>best
+        ds for algo
+      </p>
       <div aria-label='wrapper' className={`mt-5`}>
         <section aria-label='controls' className={`flex mb-8 gap-3`}>
           {/* icons would be better than text in buttons */}

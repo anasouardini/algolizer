@@ -22,9 +22,10 @@ const bubble = (list: number[], stepsLog: stepsLogT) => {
             { type: 'index', value: j + 1 },
           ],
         });
-        output[j] ^= output[j + 1];
-        output[j + 1] ^= output[j];
-        output[j] ^= output[j + 1];
+        [output[j], output[j + 1]] = [output[j + 1], output[j]]
+        // output[j] ^= output[j + 1];
+        // output[j + 1] ^= output[j];
+        // output[j] ^= output[j + 1];
 
         swapped = true;
       }

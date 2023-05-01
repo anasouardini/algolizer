@@ -1,5 +1,6 @@
 import { stepsLogT } from '../types';
 
+// TODO: use start and end instead of slice.
 const quickSelect = (list: number[], target: number, stepsLog: stepsLogT) => {
   let tmpList = [...list];
   while (tmpList.length) {

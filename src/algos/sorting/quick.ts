@@ -33,11 +33,7 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
             { type: 'index', value: swapper },
           ],
         });
-        if (outputArg[i] != outputArg[swapper]) {
-          outputArg[i] ^= outputArg[swapper];
-          outputArg[swapper] ^= outputArg[i];
-          outputArg[i] ^= outputArg[swapper];
-        }
+    [outputArg[i], outputArg[swapper]] = [outputArg[swapper], outputArg[i]];
       }
     }
     swapper++;
@@ -49,11 +45,7 @@ const quick = (list: number[], stepsLog: stepsLogT) => {
         { type: 'index', value: swapper },
       ],
     });
-    if (outputArg[i] != outputArg[swapper]) {
-      outputArg[i] ^= outputArg[swapper];
-      outputArg[swapper] ^= outputArg[i];
-      outputArg[i] ^= outputArg[swapper];
-    }
+    [outputArg[i], outputArg[swapper]] = [outputArg[swapper], outputArg[i]];
 
     // eliminating an exception in the steps animation
     const chunks:{start: number, end:number}[] = [];
