@@ -13,9 +13,11 @@ import algoTester from './algos/index';
 const MyRouter = () => (
   <BrowserRouter>
     <Routes>
-      <Route path='/' element={<Ranking />} />
-      <Route path='/ranking' element={<Ranking />} />
-      <Route path='/charts' element={<Charts />} />
+      <Route path='/' element={<SharedLayout />} >
+        <Route path='/' element={<Ranking />} />
+        <Route path='/ranking' element={<Ranking />} />
+        <Route path='/charts' element={<Charts />} />
+      </Route>
     </Routes>
   </BrowserRouter>
 );
