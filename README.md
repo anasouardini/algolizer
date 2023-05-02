@@ -1,14 +1,14 @@
-# Algorithm visualizer for demonstrating and comparing algorithms and data structues
+# Algorithm visualizer for demonstrating and comparing algorithms and data structures
 
 Algolizer is an algorithms visualizer project, which highlights the difference in performance between each algorithm and data structure (DS).
 
-When I first learned Algorithms and data structures, I was thinking that there is an ultimate best and worst algorithm/DS, It turns out it more complicated than that: each algorith and/or DS has its own usecase which you might or might not be able to identify in the first place untill you're in the middle of project.
+When I first learned Algorithms and data structures, I was thinking that there is an ultimate best and worst algorithm/DS, It turns out it's more complicated than that: each algorithm and/or DS has its own use case which you might or might not be able to identify in the first place until you're in the middle of a project.
 
 ## My motive
 
-Since this is not straight forward idea, I though why not illustrate this thorugh a project where I can gain a better understanding of theses tools, and also use it to help others understand that it's not a black and while situation but a combination of many variables, some of which we can't even know before we dive in; It's not always about the number of cpu cycles or the memory footprint, sometimes it's about the fastest to write and easiest maintaine.
+Since this is not a straightforward process, I thought, why not illustrate this through a project where I can gain a better understanding of these tools, and also may serve as a tool that helps others understand that it's not a black-and-white situation but a combination of many variables, some of which we can't even know before we dive in; It's not always about the number of CPU cycles or the memory footprint, sometimes, the fastest to write and easiest to maintain is the sweet spot.
 
-However, this project might not be the best intro to the world of algorithms and DS as it does not show all different aspects of the subject, But it's first meant as a step of my web development roadmap and a project to put on my portfolio.
+However, this project might not be the best intro to the world of algorithms and DS, as it does not demonstrate all different aspects of the subject, But it's first meant as a stepping stone of my web development roadmap and a project to put on my portfolio.
 
 ## Peek
 https://user-images.githubusercontent.com/114059811/235713778-2b01286a-f37e-4925-8a34-0cd32abba701.mp4
