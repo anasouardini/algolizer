@@ -19,7 +19,7 @@ https://user-images.githubusercontent.com/114059811/235715489-beade6a7-f734-40c4
 
 ## Tools
 
-1. React-Chart.js (uses chart.js under the hood)
+1. React-Chartjs-2 (uses chart.js under the hood)
 2. React.js
 3. React-router
 4. Tailwindcss
