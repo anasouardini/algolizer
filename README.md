@@ -22,10 +22,9 @@ https://user-images.githubusercontent.com/114059811/235715489-beade6a7-f734-40c4
 1. React-Chart.js (uses chart.js under the hood)
 2. React.js
 3. React-router
-4. React-icons
-5. Tailwindcss
-6. TypeScript
-7. Vite.js
+4. Tailwindcss
+5. TypeScript
+6. Vite.js
 
 ## Resources
 1. [FreeCodeCamp.org's Video Playlist](https://www.youtube.com/watch?v=Gj5qBheGOEo&list=PLWKjhJtqVAbkso-IbgiiP48n-O-JQA9PJ)
