@@ -1,5 +1,7 @@
 # Algorithm Visualizer for Demonstrating and Comparing Algorithms and Data Structures
 
+## <a href="https://algolizer.anasouardini.online" target="_blank">Check It Live</a>
+
 Algolizer is an algorithm visualizer project that highlights the differences in performance between each algorithm and data structure (DS).
 
 When I first learned about algorithms and data structures, I thought there was an ultimate best and worst algorithm/DS. It turns out it's more complicated than that. Each algorithm and/or DS has its own use case, which you might or might not be able to identify until you're in the middle of a project.
