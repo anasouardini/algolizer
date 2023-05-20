@@ -44,12 +44,21 @@ export default function sharedLayout() {
 
   return (
     <>
-      <nav className='bg-primary w-[8rem]'>
+      <nav className='py-3 px-5'>
         <ul className='flex gap-3 backdrop-blur-xl h-[3rem]'>
           {listNavItems()}
         </ul>
       </nav>
       <Outlet/>
+      <footer className={`w-full flex flex-wrap gap-3 justify-center items-center py-1 font-bold`}>
+        Made by
+          <span className='text-black'>
+            <a href="https://anasouardini.online">Anas Ouardini</a>
+          </span>
+        | <a href='https://github.com/segfaulty1'>Github</a>
+        | <a href='https://twitter.com/segfaulty1'>Twitter</a>
+        | <a href='https://yesfordev.com'>Blog</a>
+      </footer>
     </>
   );
 }
