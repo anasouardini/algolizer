@@ -25,14 +25,14 @@ export default function sharedLayout() {
     return (
       <>
         <li>
-          <NavLink to='/charts'
+          <NavLink to="/charts"
               className={activeLink}
             >
             charts
           </NavLink>
         </li>
         <li>
-          <NavLink to='/ranking'
+          <NavLink to="/ranking"
               className={activeLink}
             >
             ranking
@@ -52,12 +52,12 @@ export default function sharedLayout() {
       <Outlet/>
       <footer className={`w-full flex flex-wrap gap-3 justify-center items-center py-1 font-bold`}>
         Made by
-          <span className='text-black'>
+          <span className="text-black">
             <a href="https://anasouardini.online">Anas Ouardini</a>
           </span>
-        | <a target='_blank' href='https://github.com/anasouardini/algolizer'>Github</a>
-        | <a target='_blank' href='https://twitter.com/segfaulty1'>Twitter</a>
-        | <a target='_blank' href='https://yesfordev.com'>Blog</a>
+        | <a target="_blank" href="https://github.com/anasouardini/algolizer">Github</a>
+        | <a target="_blank" href="https://twitter.com/segfaulty1">Twitter</a>
+        | <a target="_blank" href="https://blog.anasouardini.online/posts">Blog</a>
       </footer>
     </>
   );
